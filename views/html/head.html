@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Ymachine</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!--append ‘#!watch’ to the browser URL, then refresh the page. -->
+
+    <!-- Bootstrap theme -->
+
+    <link href="stylesheets/ymachine.css" rel="stylesheet">
+    <link href="stylesheets/common.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="scripts/html5shiv.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="img/product_imgYmachine1.png">
+
+    <!--<script type="text/javascript" src="scripts/jquery.min.js"></script>-->
+    <script type="text/javascript" src="scripts/jquery-1.11.2.min.js"></script>
+    <script src="scripts/jquery.slides.js"></script>
+    <script src="scripts/respond.js"></script>
+    <script src="scripts/ymachine.js"></script>
+
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/scripts/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.scripts/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!--[if IE 8]><link rel="stylesheet" type="text/css" href="stylesheets/cross.css" /><![endif]-->
+    <script>
+        $(document).ready(function () {
+
+            $.post('/usemenu', function (data) {      // 중고제품 메뉴
+                cate_list = data.sending;
+                make_CateList();
+            });
+            $.post('/newmenu', function (data) {      // 신제품 메뉴
+                cate_list1 = data.sending;
+                make_CateList1();
+
+            });
+
+            make_CateList = function() {
+                if (cate_list[0].category1_code == cate_list[1].category1_code) {
+                    $("#useclick").append("<a href=" + '/Old_productList?category1_code=' + cate_list[1].category1_code + '&category2_code=' + cate_list[1].category2_code + ">" + '중고제품' + "</a>");
+                }
+                else{
+                    $("#useclick").append("<a href=" + '/Old_productList?category1_code=' + cate_list[0].category1_code + '&category2_code=' + cate_list[0].category2_code + ">" + '중고제품' + "</a>");
+                }
+
+            }
+            make_CateList1 = function() {
+                if (cate_list1[0].category1_code == cate_list1[1].category1_code) {
+
+                    $("#newclick").append("<a href=" + '/New_productList?category1_code=' + cate_list1[1].category1_code + '&category2_code=' + cate_list1[1].category2_code + ">" + '신제품소개' + "</a>");
+                }
+                else{
+                    $("#newclick").append("<a href=" + '/New_productList?category1_code=' + cate_list1[0].category1_code + '&category2_code=' + cate_list1[0].category2_code + ">" + '신제품소개' + "</a>");
+                }
+            }
+
+
+        });
+
+
+    </script>
+
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-61713268-2', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+</head>
+
+<body>
+<header>
+    <!--탑메뉴-->
+    <div class="top-menu">
+        <ul>
+            <li id="loginsection">
+            </li>
+            <li>
+                <a href="/">공작기계</a>
+            </li>
+            <li>
+                <a href="#" onclick="y_click()">금융리스</a>
+            </li>
+            <li>
+                <a href="/sitemap">Site map</a>
+            </li>
+            <li id="loginsection2">
+            </li>
+        </ul>
+    </div>
+    <!--/탑메뉴-->
+    <!--메인메뉴-->
+    <div class="header-wrap">
+        <a href="/"><img src="img/y_machine_logo.png" alt="와이머신"></a>
+        <ul>
+            <li>
+                <a href="/introduction">회사소개</a>
+            </li>
+            <li>
+            <li id="newclick">
+            </li>
+            <li>
+            <li id="useclick">
+            </li>
+            <li>
+                <a href="/customerWrite">고객문의</a>
+            </li>
+            <li>
+                <a href="/oldOrderwrite">중고장비문의</a>
+            </li>
+            <li>
+                <a href="/noticeList">공지사항</a>
+            </li>
+        </ul>
+    </div>
+    <!--/메인메뉴-->
+</header>
+
+</body>
+<script>
+    var chkout = function () {
+        sessionStorage.setItem('name', '');
+        sessionStorage.setItem('role', '');
+        alert('로그아웃합니다');
+        location.href("/index");
+    };
+    $(document).ready(function () {
+        if (sessionStorage.getItem('role') == null || sessionStorage.getItem('role') == '') {
+            $('#loginsection').append("<a href='/login'>로그인</a>");
+        } else {
+            $('#loginsection').append("<a>" + sessionStorage.getItem('name') + " 님 환영합니다.</a>");
+            $('#loginsection2').append("<a href='' onclick='chkout()'>로그아웃</a>");
+        }
+    });
+    function y_click(){
+        window.open('http://ylease.co.kr');
+    }
+</script>

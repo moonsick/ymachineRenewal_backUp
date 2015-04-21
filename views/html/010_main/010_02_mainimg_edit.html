@@ -1,0 +1,210 @@
+<script>
+    var item = [];
+    $(document).ready(function() {
+        $.post('/main_img_list', function (data) {
+            item = data.sending;
+            main_img_list();
+            fileCount=item.length+1;
+            fileNameCount=item.length+1;
+            total_count = item.length+1;
+        });
+        var main_img_list = function(){
+            for(var i=0; i<item.length; i++) {
+                item[i].file_name = item[i].file_name.substring(14);
+                $("#addedFormListDiv").append("<li style='font-size:15px;' id='old_main_img"+i+"'>"+item[i].file_name+"<span class='pull-right'>" +
+                "<button style='margin-right:10px;' type='button' class='btn list-btn02' onclick='old_del("+i+")'>삭제</button>" +
+                "<input type='text' name='old_file_order["+i+"]' id='old_file_order"+i+"' placeholder='순서' style='width:30px;' value='"+item[i].file_order+"'></span></li>" +
+                "<input type='text' class='hidden' name='old_file_id["+i+"]' id='old_file_id"+i+"' value='"+item[i].id+"'>" +
+                "<input type='text' class='hidden' name='old_file_del["+i+"]' id='old_file_del"+i+"' value='0'>");
+            }
+        }
+    });
+
+    var old_del=function(i){
+        $("#old_file_del"+i).val(1);
+        document.getElementById("old_main_img"+i).className="hidden";
+
+    }
+</script>
+
+
+
+
+<script>
+    var total_count=0;
+    var fileCount = 1;                // 한번에 파일 올리기 제한 거는 변수
+    var fileNameCount = 1;           // 한번에 파일 올리기 제한 거는 변수 ( 새로 추가시 계속 ++ )
+    var addFormCount = 8;            // 파일 제한 최대수
+
+    var selectFile = function(thisObj,value){
+        var addedFormList = document.getElementById("addedFormListDiv");
+
+        var ary = thisObj.value.split('\\');   // 파일을 선택 했을시 선택한 파일의 경로에서 \를 뺀후 \ 기준으로 덩어리씩 ary에 배열로 담는다.
+        var fileName = ary[ary.length - 1];    //  ary의 맨마지막 덩어리 즉 파일 이름을 가져온다.
+        var filePath = thisObj.value.replace(/\\/gi, "&");    // \를 빼는 것이 아닌 \를 모두 &로 바꾸어 준다.
+
+        if (fileCount > addFormCount) {        // 파일 카운터가 최대치카운터를 넘길시 경고, 파일 카운터는 파일이 추가될때마다 +1씩 추가한다. 밑에 정의되어 있다.
+            alert("업로드는 " + addFormCount + "개 이상 할 수 없습니다");
+            document.getElementById(value).outerHTML = document.getElementById(value).outerHTML;       // 숫자가 초과 했을시 input 창에 마지막으로 고른 파일이름을 지우게 해준다.
+            return;
+        }
+
+        document.getElementById(value).style.display = "none";
+
+
+
+        str = fileName+"<span class='pull-right'>" +
+        "<button style='margin-right:10px;' type='button' class='btn list-btn02' onclick='del("+value+")'>삭제</button>" +
+        "<input type='text' name='new_file_order["+value+"]' id='new_file_order"+value+"' placeholder='순서' style='width:30px;'></span>";
+
+
+        var addFileList = document.createElement("li"); // 폼 생성
+
+        addFileList.id = value + "LIST"; // 폼 Div에 ID 부 여 (삭제를 위해)
+        addFileList.style.fontSize = '15px'
+        addFileList.innerHTML = str; // 폼 Div안에 HTML삽입
+        addedFormList.appendChild(addFileList);
+        addForm();
+    }
+
+
+
+
+
+
+
+
+
+
+    function addForm() {          // 선택한 파일을 써버로 올려주기 위한 함수
+
+        var addedForxsiv = document.getElementById("addedForxsiv");
+        /*var date = new Date();
+         var file = date.getTime();*/
+
+        var str = "";    // innerHTML을 위한 변수
+
+        str = "<input type=file id=" + fileNameCount + " name=file" + "[" + fileNameCount + "]" + " onChange='javascript:selectFile(this," + fileNameCount + ")'>"; // innerHTML에 추가될 동작을 작성한다.
+
+
+        var addedDiv = document.createElement("div");    // <div>를 만들고 addeDiv변수에 넣는다.
+        addedDiv.id = "div" + fileNameCount;            // 위에 만든 <div> id를 id="div+fileNameCount" 로 설정한다.
+        addedDiv.innerHTML = str;                         // <div> 안에 str 즉 위에 작성한 input 태그를 넣는다.
+
+        /*var dd = document.getElementById(fileCount);*/
+
+        addedForxsiv.appendChild(addedDiv);                // 삽입할 str를 넣는 <div>를 다시 addeForxsiv 영역에 너는다.
+
+        //style="position:absolute; opacity:0;"
+        //이전폼값을 지운다
+
+        fileNameCount = fileNameCount + 1;           //각 변수들에 +1을 한다.
+        fileCount = fileCount + 1;
+        total_count++;
+        /*             if (fileCount>1){
+         alert("1111");
+         } */
+    };
+
+
+
+
+
+    function del(value) {        // file 선택시 나오는 영역에서 삭제를 누를시 동작
+        var addedForxsiv = document.getElementById("addedForxsiv");
+        var addedDiv = document.getElementById("div" + value);
+
+        var addedFormList = document.getElementById("addedFormListDiv");
+
+        addedForxsiv.removeChild(addedDiv); // 폼 삭제
+
+        if (document.getElementById("addedForxsiv").childNodes.length == 0) {
+            addForm();
+        }
+        /*   if(fileCount==1){
+         addedFormList.removeChild(document.getElementById("fileinput"+"LIST"));
+         fileCount = fileCount-1;
+         }else{ */
+        addedFormList.removeChild(document.getElementById(value + "LIST"));
+        fileCount = fileCount - 1;
+
+    };
+
+</script>
+
+
+
+<script>
+    var insert_go = function(){
+        var n=0;
+        for(var i =0;i<total_count;i++){
+            if($("#old_file_order"+i).val()==""){
+                n=1;
+                alert("순서를 입력해 주세요");
+                $("#old_file_order"+i).focus();
+                return;
+            }
+            else if($("#new_file_order"+i).val()==""){
+                alert("순서를 입력해 주세요");
+                $("#new_file_order"+i).focus();
+                return;
+            }
+        }
+
+        if(n==0) {
+            if (confirm("입력하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("작성이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                document.a.submit();
+            }
+        }
+    }
+</script>
+
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">메인 이미지 등록</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <form role="form" method="post" action="/main_img_insert" enctype="multipart/form-data" id="used" name="a">
+        <input class="hidden" value="99" name="old_file_order[20]">
+        <input class="hidden" value="99" name="old_file_id[20]">
+        <input class="hidden" value="99" name="old_file_del[20]">
+
+    <div class="contents" style="margin:0 auto; float:none;">
+        <!--추천매물-->
+        <h2><span>|</span> 메인 이미지 등록</h2>
+        <h5 style="color:#f26322; font-size:14px; margin-bottom:10px;">현재목록</h5>
+        <div id="addedForxsiv">
+            <div id="div0">
+                <input type="File" name="file[0]" id="0" onchange="selectFile(this,this.id);">
+            </div>
+        </div>
+
+        <div class="recom-wrap" style="width:100%; height: 340px; margin-top:10px; overflow: hidden;">
+
+            <ul class="recoman-pro" id="addedFormListDiv">
+                <!--<li>aaaaa <span class="pull-right">
+                        <a href="#"><button class="btn btn-default">미리보기</button></a>
+                        <a href="#"> <button class="btn list-btn02">삭제</button></a>
+                        <input type="text" style="width:30px;">
+                    </span></li>-->
+            </ul>
+        </div>
+
+        <button type="button" class="btn btn-rg" style="float:right; margin-bottom:30px;" onclick="insert_go();">적용</button>
+    </div>
+        </form>
+
+
+
+</div>

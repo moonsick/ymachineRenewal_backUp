@@ -1,0 +1,77 @@
+<script type="text/javascript" src="scripts/pagenation.js"></script>
+<script>
+    $(document).ready(function () {
+        var items = [];
+        var num = 1;
+        var pagedItem = [];
+        $.post('/getlist2', function (data) {
+            items = data.sending;
+            divide(num);
+
+            if((items.length % 5)==0){
+                pagenation((items.length / 5)-1);
+            }
+            else{
+                pagenation(items.length / 5);
+            }
+        });
+
+        var divide = function (num) {
+            var n = 0;
+            for (var i = (num - 1) * 5; i < num * 5; i++) {
+                if (items[i] != null) {
+                    pagedItem[n] = items[i];
+                } else {
+                    pagedItem[n] = null;
+                }
+                n++;
+            }
+            $('#liston').empty();
+            $(pagedItem).each(function (i) {
+                var id = this.id;
+                var title = this.title;
+                if (this.id != null) {
+                    $("#liston").append("<tr><td><a href='/oldOrderDetail?id=" + id + "'>"+this.title+"</a></td><td style='text-align:center' ><a href='/oldOrderDetail?id=" + id + "'>"+this.writer+"</a></td><td style='text-align:center' ><a href='/oldOrderDetail?id=" + id + "'>"+this.date+"</a></td>");
+                }
+            });
+        };
+        var pagenation = function (paged) {
+            $('#page-selection').bootpag({
+                total: paged + 1,
+                page: 1,
+                maxVisible: 10
+            }).on('page', function (event, num) {
+                divide(num);
+            });
+        };
+    });
+</script>
+
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">중고장비문의</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <div class="contents">
+        <h2><span>|</span> 중고장비문의</h2>
+        <table class="table">
+            <thead>
+            <tr><th style="width:450px;">제목</th><th>작성자</th><th style="width:150px;">작성일</th></tr>
+            </thead>
+            <tbody id="liston">
+
+            </tbody>
+        </table>
+        <div id="page-selection"></div>
+    </div>
+</div>

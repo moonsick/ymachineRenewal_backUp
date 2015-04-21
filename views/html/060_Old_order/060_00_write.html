@@ -1,0 +1,240 @@
+<script>
+
+    function validate_join() {
+        var i=0;
+        if ($("#usedInputTitle").val() == "") {
+            i=1;
+            alert('제목을 입력해주세요.');
+            $("#usedInputTitle").focus();
+            return;
+        }
+
+        if ($("#usedInputname").val() == "") {
+            i=1;
+            alert('작성자를 입력해주세요');
+            $("#usedInputname").focus();
+            return;
+        }
+
+        if ($("#usedInputCall").val() == "") {
+            i=1;
+            alert('연락처를 입력해주세요');
+            $("#usedInputCall").focus();
+            return;
+        }
+
+
+        if ($("#usedInputCompany").val() == "") {
+            i=1;
+            alert('업체명을 입력해주세요');
+            $("#usedInputCompany").focus();
+            return;
+        }
+
+
+        if ($("#usedInputContent").val() == "") {
+            i=1;
+            alert('내용을 입력해주세요.');
+            $("#usedInputContent").focus();
+            return;
+        }
+        if(i!=1);
+        {
+            /*           $("#used").submit();
+             */
+            document.a.submit();
+
+        }
+
+    }
+</script>
+
+
+<script>
+    var fileCount = 1;
+    var fileNameCount = 1;
+    var addFormCount = 20;
+
+
+    function selectFile(thisObj, value) {
+        var addedFormList = document.getElementById("addedFormListDiv");
+        var ua = window.navigator.userAgent;
+        //파일업로드 금지 파일 추가 html,htm,jsp,js,asp,aspx,css,
+        /* if (!/(\.gif|\.jpg|\.jpeg|\.png)$/i.test(thisObj.value)) {
+         alert("이미지 형식의 파일을 선택하십시오");
+         //폼 초기화
+         document.getElementById(value).outerHTML = document.getElementById(value).outerHTML;
+         return;
+         }*/
+
+        var ary = thisObj.value.split('\\');
+        var fileName = ary[ary.length - 1];
+        var filePath = thisObj.value.replace(/\\/gi, "&");
+
+
+        /*     if(document.getElementById(value+"LIST")!=undefined){   //기존선택한걸 선택할때
+         addedFormList.removeChild(document.getElementById(value+"LIST"));
+         }else{    */
+
+        if (fileCount > addFormCount) {
+            alert("업로드는 " + addFormCount + "개 이상 할 수 없습니다" + value);
+            document.getElementById(value).outerHTML = document.getElementById(value).outerHTML;
+            return;
+        }
+
+        document.getElementById(value).style.display = "none";
+        addForm();
+
+
+        /*if (ua.indexOf("MSIE") > -1) {//ie일때
+
+         str = "<a href='javascript:del(" + value + ")'>삭제</a> " + fileName + "  <a href='javascript:addLink('" + filePath + "')'>본문에넣기</a> ";
+         } else {
+         str = "<a href='javascript:del(" + value + ")'>삭제</a> " + fileName;
+         }*/
+        str = "<a href='javascript:del(" + value + ")'>삭제</a> " + fileName;
+        var addFileList = document.createElement("div"); // 폼 생성
+
+        addFileList.id = value + "LIST"; // 폼 Div에 ID 부 여 (삭제를 위해)
+        addFileList.innerHTML = str; // 폼 Div안에 HTML삽입
+        addedFormList.appendChild(addFileList); // 삽입할 DIV에 생성한 폼 삽입
+
+    }
+
+    function addForm() {
+
+        var addedForxsiv = document.getElementById("addedForxsiv");
+
+        var date = new Date();
+        var file = date.getTime();
+
+        var str = "";
+
+        str = "<input type=file id=" + fileNameCount + " name=file" + "[" + fileNameCount + "]" + " onChange='javascript:selectFile(this," + fileNameCount + ")'>";
+
+
+        var addedDiv = document.createElement("div"); // 폼 생성
+        addedDiv.id = "div" + fileNameCount; // 폼 Div에 ID 부 여 (삭제를 위해)
+        addedDiv.innerHTML = str; // 폼 Div안에 HTML삽입
+
+        var dd = document.getElementById(fileCount);
+
+        addedForxsiv.appendChild(addedDiv); // 삽입할 DIV에 생성한 폼 삽입
+
+        //style="position:absolute; opacity:0;"
+        //이전폼값을 지운다
+
+        fileNameCount = fileNameCount + 1;
+        fileCount = fileCount + 1;
+        /*             if (fileCount>1){
+         alert("1111");
+         } */
+    }
+    function del(value) {
+
+        var addedForxsiv = document.getElementById("addedForxsiv");
+        var addedDiv = document.getElementById("div" + value);
+
+        var addedFormList = document.getElementById("addedFormListDiv");
+
+        addedForxsiv.removeChild(addedDiv); // 폼 삭제
+
+        if (document.getElementById("addedForxsiv").childNodes.length == 0) {
+            addForm();
+
+        }
+        /*   if(fileCount==1){
+         addedFormList.removeChild(document.getElementById("fileinput"+"LIST"));
+         fileCount = fileCount-1;
+         }else{ */
+        addedFormList.removeChild(document.getElementById(value + "LIST"));
+        fileCount = fileCount - 1;
+
+    }
+
+    $('#used').on('submit', function (event) {
+        $('#used').submit();
+    });
+    $('#reqList').on('submit', function (event) {
+        $('#reqList').submit();
+    });
+
+    $(document).ready(function () {
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+        } else {
+            $("#list").append("<button type='button' class='btn btn-edit' onclick='customerList()'> 목록 </button>")
+
+        }
+    });
+    var customerList = function(){
+        location.href="/oldOrderList"
+    };
+</script>
+
+
+
+
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">중고장비문의</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <div class="contents">
+        <h2><span>|</span> 중고장비문의</h2>
+        <form role="form" id="used" name="a" action="/OldUpload" enctype="multipart/form-data" method="post" class="y-form c-write">
+            <label for="usedInputTitle">제목</label><span>*필수 항목입니다.</span>
+            <input type="text" class="form-control" id="usedInputTitle" name="usedInputTitle" placeholder="문의사항 제목을 적어주세요">
+
+            <div style="width:48%; float:left;">
+                <label for="usedInputname">작성자</label><span>*필수 항목입니다.</span>
+                <input type="text" class="form-control" id="usedInputname" name="usedInputname" placeholder="작성자 성함을 적어주세요"></div>
+
+            <div style="width:48%; float:right; padding-right:10px;">
+                <label for="usedInputCall">연락처</label><span>*필수 항목입니다.</span>
+                <input type="tel" class="form-control" id="usedInputCall" name="usedInputCall" placeholder="적어주신 연락처로 연락드리겠습니다"></div>
+
+            <div style="width:48%; float:left;">
+                <label for="usedInputCompany">업체명</label><span>*필수 항목입니다.</span>
+                <input type="tel" class="form-control" id="usedInputCompany" name="usedInputCompany" placeholder="업체명을 적어주세요">
+            </div>
+
+            <div style="width:48%; float:right;padding-right:10px;">
+                <label for="usedInputEmail">이메일</label>
+                <input type="tel" class="form-control" id="usedInputEmail" name="usedInputEmail" placeholder="등록하시면 와이머신의 홍보자료를 받으실 수 있습니다">
+            </div>
+
+            <div style="clear:both;">
+                <label for="usedInputContent">내용</label><span>*필수 항목입니다.</span>
+                <textarea class="form-control" id="usedInputContent" name="usedInputContent" rows="5" placeholder="문의사항을 적어주세요"></textarea>
+            </div>
+
+            <label>파일리스트</label>
+            <div class="myfilelist">
+                <div id="addedForxsiv">
+                    <div id="div0">
+                        <input type="File" name="file[0]" id="0"
+                               onchange="selectFile(this,this.id);">
+                    </div>
+                </div>
+                <div id="addedFormListDiv"></div>
+            </div>
+
+
+
+        </form>
+        <div class="pull-right" style="margin:15px;"  id="list">
+            <button type="button" class="btn btn-rg" onclick="validate_join();">등록</button>
+        </div>
+
+    </div>
+</div>

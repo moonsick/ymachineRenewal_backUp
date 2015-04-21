@@ -1,0 +1,573 @@
+
+    <script>
+        var globar_item5 = [];
+        var cate_list = [];
+        var new_count = 1;
+        var model_count=1;
+        var model_count2=0;
+        var n_model = [];
+        var lv1_id = [];
+        var lv2_id = [];
+        var p_id = [];
+
+        var url = window.location;
+        getValue = String(url).split('?');
+        getValue = getValue[1].split('&');
+        lv1_id = getValue[0].split('='); //키와 값분리
+        lv2_id = getValue[1].split('='); //키와 값분리
+        p_id = getValue[2].split('='); //키와 값분리
+
+        lv1_id = lv1_id[1];
+        lv2_id = lv2_id[1];
+        p_id = p_id[1];
+
+
+
+
+        $(document).ready(function () {
+            $("#category_lv1_id").val(lv1_id);
+            $("#category_lv2_id").val(lv2_id);
+            $("#product_id").val(p_id);
+            $.post('/newmenu', function (data) {      // 신제품 메뉴
+                cate_list = data.sending;
+                make_CateList();
+
+                /*
+                 pagenation(items.length / 5);
+                 */
+            });
+            var make_CateList = function () {
+                var id_insert;
+
+                for (var i = 0; i < cate_list.length; i++) {
+                    if (cate_list[i].category2_code == "00") {
+                        if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                            id_insert = cate_list[i].category1_code;
+                            $("#liston2").append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                        } else {
+                            id_insert = cate_list[i].category1_code;
+                            $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                        }
+                    }
+                    else {
+                        $("#"+id_insert).append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                    } }
+            };
+
+
+            var title = document.getElementById('name');
+            var company = document.getElementById('company');
+            var option = document.getElementById('option');
+
+            $.post('/get_product_Amend', {lv1_id: lv1_id,lv2_id: lv2_id, p_id: p_id}, function (data) {
+                var message = data.sending;
+                title.value = message[0].name;
+                company.value = message[0].company;
+                option.value = message[0].option;
+            });
+
+
+            $.post('/product_oldfile', {lv1_id: lv1_id,lv2_id: lv2_id, p_id: p_id}, function (data) {      // 기존에 입력한 파일을 불러오고 뿌린다.
+                var item5=data.sending;
+                globar_item5 = item5;
+                fileCount = globar_item5.length+1;
+                fileNameCount = globar_item5.length+1;
+                for(var i=0; i<item5.length; i++){
+                    $("#addedFormListDiv").append("<input class='hidden' id='oldfile"+i+"' name='oldfile["+i+"]' value='"+item5[i].pic_id+"'></input><div id='div_hidden"+i+"'><div><a href='javascript:old_del(" + i + ")'>삭제</a> " + item5[i].file_name+"<input type='checkbox' onclick='rep_check("+i+");' id='check"+i+"' style='width: 15px; height: 15px; margin-left:10px;' value='0'> 대표사진</div></div>" +
+                    "<input class='hidden' name='req_oldfile' value='0' id='check2"+i+"'>");
+                    if(item5[i].representative_img=="1"){
+                        $("#check"+i).attr('checked',true);
+                        $("#check2"+i).val("1");
+                        check++;
+                    }
+                }
+            });
+
+
+
+
+
+
+            $.post('/get_n_model',{lv1_id: lv1_id,lv2_id: lv2_id, p_id: p_id},function (data){
+                n_model= data.sending;
+                create_old_model();
+            });
+            create_old_model = function() {
+                for (var i = 0; i < n_model.length; i++) {
+                    $("#model_start").append("<table id='old_model"+i+"'><tr><th>" +
+                    "<label for='old_model_name"+i+"'>모델명</label></th><td>" +
+                    "<input type='text' value='"+n_model[i].product_model_name+"' class='form-control' id='old_model_name"+i+"' name='old_model_name["+i+"]'></td>" +
+                    "</tr><tr><th>" +
+                    "<label for='model_option"+model_count+"'>모델설명</label></th><td>" +
+                    "<textarea rows='3' class='form-control' id='old_model_option"+i+"' name='old_model_option["+i+"]'></textarea>" +
+                    "<button type='button' class='btn btn-del' style='float:right; margin-top:5px;' onclick='kang("+i+")'>" +
+                    "삭제</button></td></tr></table>" +
+                    "<input class='hidden' name='old_model_id["+i+"]' value='"+n_model[i].product_model_id+"'>" +
+                    "<input class='hidden' name='old_model_del' value='0' id='old_model_del" + i + "'>" +
+                    "<input class='hidden' name='old_model_name1["+i+"]' id='old_model_name1"+i+"'>" +
+                    "<textarea class='hidden' name='old_model_option1["+i+"]' id='old_model_option1"+i+"'>");
+                    model_count++;
+                    model_count2++;
+                    $("#old_model_option"+i).val(n_model[i].product_model_option);
+                }
+            }
+
+
+
+            $("#c_button").append("<button type='button' class='btn btn-rg' style='float: right' onclick='create_model(model_count);'>+ 모델 등록 추가</button><br>");
+
+
+        });
+
+    </script>
+
+
+
+
+
+
+
+    <script>
+        // <body> 안에 있는 등록 버튼을 누를시 (onclick="insert_go"를 찾으면 알수 있다.) 동작 되는 함수 이다.   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 이 함수의 역활은 1. 제목, 등록자, 내용 등의 입력창에서 꼭 써야 되는 부분을 설정 한다.
+        //                  2. 전부 입력이 됐을시  등록 하시겠습니까? 라는 문구로 마지막 절차를 확인한다.
+        //                  3. 입력창에 있는 정보들을 (제목,내용,작성자 등등) 쿼리문으로 전달한다.
+        function insert_go() {
+            for(var e=0; e<n_model.length;e++){
+                $("#old_model_name1"+e+"").val($("#old_model_name"+e+"").val())
+                $("#old_model_option1"+e+"").val($("#old_model_option"+e+"").val())
+            }
+
+            var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+
+            if ($("#name").val() == "") {             //  <body>안에 id="name" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+                i=1;                                    // i변수 안에서는 1을 넣는다.
+                alert('제품명을 입력하세요.');        // 물품명을 입력하라는 경고창을 띄운다.
+                $("#name").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+                return;
+            }
+
+
+            if (check == 0){
+                i=1;
+                alert('대표사진을 선택하세요');
+                return;
+            }
+
+            for(var a=0; a<model_count; a++) {
+                if ($("#old_model_name"+a).val()=="") {
+                    alert(a);
+                    alert('모델명을 입력하세요');
+                    $("#old_model_name"+a).focus();
+                    return;
+                }
+            }
+            for(var a=0; a<model_count; a++) {
+                if ($("#model_name"+a).val()=="") {
+                    alert(a);
+                    alert(model_count);
+                    alert('모델명을 입력하세요');
+                    $("#model_name"+a).focus();
+                    return;
+                }
+            }
+
+
+
+            if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+            {
+                if (confirm("입력하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                    alert("작성이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                    document.a.submit();
+                }
+            }
+        }///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        //PC버전 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        var fileCount = 1;                // 한번에 파일 올리기 제한 거는 변수
+        var fileNameCount = 1;           // 한번에 파일 올리기 제한 거는 변수 ( 새로 추가시 계속 ++ )
+        var addFormCount = 8;            // 파일 제한 최대수
+        var check = 0;                             // 대표사진 1개만 클릭할수 있게 가려주는 변수
+
+        function selectFile(thisObj, value) {                                                // selectFile(); 함수는 <body>에 <input> 태그에 있다. thisObj는 파일의 경로,이름이 나와있고 value 는 id값을 가져온다.
+            var addedFormList = document.getElementById("addedFormListDiv");             // <body>안에 id="addedFormListDiv" 은곳을 찾는다. 이영역은 파일은 선택 했을시 어떤걸 선택 했는지 보여주는 영역이다.
+            var ua = window.navigator.userAgent;                  // 브라우저 정보로 예상된다.
+
+            //파일업로드 금지 파일 추가 html,htm,jsp,js,asp,aspx,css,
+            /* if (!/(\.gif|\.jpg|\.jpeg|\.png)$/i.test(thisObj.value)) {
+             alert("이미지 형식의 파일을 선택하십시오");
+             //폼 초기화
+             document.getElementById(value).outerHTML = document.getElementById(value).outerHTML;
+             return;
+             }*/
+
+            var ary = thisObj.value.split('\\');   // 파일을 선택 했을시 선택한 파일의 경로에서 \를 뺀후 \ 기준으로 덩어리씩 ary에 배열로 담는다.
+            var fileName = ary[ary.length - 1];    //  ary의 맨마지막 덩어리 즉 파일 이름을 가져온다.
+            var filePath = thisObj.value.replace(/\\/gi, "&");    // \를 빼는 것이 아닌 \를 모두 &로 바꾸어 준다.
+
+
+            /*     if(document.getElementById(value+"LIST")!=undefined){   //기존선택한걸 선택할때
+             addedFormList.removeChild(document.getElementById(value+"LIST"));
+             }else{    */
+
+            if (fileCount > addFormCount) {        // 파일 카운터가 최대치카운터를 넘길시 경고, 파일 카운터는 파일이 추가될때마다 +1씩 추가한다. 밑에 정의되어 있다.
+                alert("업로드는 " + addFormCount + "개 이상 할 수 없습니다");
+                document.getElementById(value).outerHTML = document.getElementById(value).outerHTML;       // 숫자가 초과 했을시 input 창에 마지막으로 고른 파일이름을 지우게 해준다.
+                return;
+            }
+
+            document.getElementById(value).style.display = "none";           // 파일이 성공적으로 선택 됐을시 input창을 안보이게 한다.선택한 파일이 안보여 지지만,
+            // 여기서는 선택한 파일을 다른 영역으로 다시 보여주는 함수를 썻기 때문에 2중첩이 되는걸 막기위해 input창를 가린다.
+            addForm();     // addForm() 실행 DB로 파일값을 보내주는 함수
+
+
+            /*if (ua.indexOf("MSIE") > -1) {//ie일때
+
+                str = "<a href='javascript:del(" + value + ")'>삭제</a> " + fileName + "  <a href='javascript:addLink('" + filePath + "')'>본문에넣기</a> ";
+            } else {
+                str = "<a href='javascript:del(" + value + ")'>삭제</a> " + fileName + "<input type='checkbox' onclick='n_rep_check(" + value + ");' id='n_check" + value + "' style='width: 15px; height: 15px; margin-left:10px;' value='0'> 대표사진" +
+                "<input class='hidden' name='newfile' value='0' id='n_check2" + value + "'>";     // 오류가 안났을때는 addedFormListDiv영역에 삭제 file이름 으로 나타난다.
+            }*/
+            str = "<a href='javascript:del(" + value + ")'>삭제</a> " + fileName + "<input type='checkbox' onclick='n_rep_check(" + value + ");' id='n_check" + value + "' style='width: 15px; height: 15px; margin-left:10px;' value='0'> 대표사진" +
+            "<input class='hidden' name='newfile' value='0' id='n_check2" + value + "'>";     // 오류가 안났을때는 addedFormListDiv영역에 삭제 file이름 으로 나타난다.
+
+            var addFileList = document.createElement("div"); // 폼 생성
+
+            addFileList.id = value + "LIST"; // 폼 Div에 ID 부 여 (삭제를 위해)
+            addFileList.innerHTML = str; // 폼 Div안에 HTML삽입
+            addedFormList.appendChild(addFileList); // 삽입할 DIV에 생성한 폼 삽입     pc버전
+
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function addForm() {          // 선택한 파일을 써버로 올려주기 위한 함수
+
+            var addedForxsiv = document.getElementById("addedForxsiv");
+            /*var date = new Date();
+             var file = date.getTime();*/
+
+            var str = "";    // innerHTML을 위한 변수
+
+            str = "<input type=file id=" + fileNameCount + " name=file" + "[" + fileNameCount + "]" + " onChange='javascript:selectFile(this," + fileNameCount + ")'>"; // innerHTML에 추가될 동작을 작성한다.
+
+
+            var addedDiv = document.createElement("div");    // <div>를 만들고 addeDiv변수에 넣는다.
+            addedDiv.id = "div" + fileNameCount;            // 위에 만든 <div> id를 id="div+fileNameCount" 로 설정한다.
+            addedDiv.innerHTML = str;                         // <div> 안에 str 즉 위에 작성한 input 태그를 넣는다.
+
+            /*var dd = document.getElementById(fileCount);*/
+
+            addedForxsiv.appendChild(addedDiv);                // 삽입할 str를 넣는 <div>를 다시 addeForxsiv 영역에 너는다.
+
+            //style="position:absolute; opacity:0;"
+            //이전폼값을 지운다
+
+            fileNameCount = fileNameCount + 1;           //각 변수들에 +1을 한다.
+            fileCount = fileCount + 1;
+            /*             if (fileCount>1){
+             alert("1111");
+             } */
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function del(value) {        // file 선택시 나오는 영역에서 삭제를 누를시 동작
+            if($("#n_check2"+value).val()=="1"){
+                alert("삭제 할수 없습니다. 대표 사진을 해체 후 삭제해 주세요")
+            }
+            else if($("#n_check2"+value).val()=="0") {
+                var addedForxsiv = document.getElementById("addedForxsiv");
+                var addedDiv = document.getElementById("div" + value);
+
+                var addedFormList = document.getElementById("addedFormListDiv");
+
+                addedForxsiv.removeChild(addedDiv); // 폼 삭제
+
+                if (document.getElementById("addedForxsiv").childNodes.length == 0) {
+                    addForm();
+
+                }
+                /*   if(fileCount==1){
+                 addedFormList.removeChild(document.getElementById("fileinput"+"LIST"));
+                 fileCount = fileCount-1;
+                 }else{ */
+                addedFormList.removeChild(document.getElementById(value + "LIST"));
+                fileCount = fileCount - 1;
+            }
+        };
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        function old_del(i){
+            if($("#check2"+i).val()=="1"){
+                alert("삭제 할수 없습니다. 대표 사진을 해체 후 삭제해 주세요")
+            }
+            else if($("#check2"+i).val()=="0") {
+                $("#div_hidden" + i).replaceWith("<div class='hidden'></div>");
+                $("#oldfile" + i).val(globar_item5[i].pic_id + "+1");
+            }
+        }
+
+
+    </script>
+
+
+    <script>
+        ///////// 대표 이미지 설정 함수 체크 할시 val(1), 해체할시 val(0) 으로 구분, 2개이상 체크할시 check 전역 함수로 체크하여 2개 이상 체크를 막는다.////////////////////////////////////////////////////////////////////////////////////////////////////////
+        var rep_check = function(q){
+
+            if($("#check"+q).is(':checked')==true){                 // check 박스 클릭시
+                $("#check2"+q).val("1");                              // 숨긴 input 박스 value = 1
+                check++;
+            }
+
+            else if($("#check"+q).is(':checked')==false){          // check 박스 클릭 해체시
+                $("#check2"+q).val("0");                              // 숨긴 input 박스 value = 0
+                check--;
+            }
+
+            if(check>1){                                                 // check 박스 2개 이상 선택시
+                alert("대표 사진은 2개이상 선택 하실수 없습니다.")    // 경고창
+                $("#check"+q).attr('checked',false);                   // 2번째 체크박스 강제로 해제
+                $("#check2"+q).val("0");                                 // 선택한 체크박스 value= 0 값
+                check--;
+
+            }
+        };
+
+
+
+        var n_rep_check = function(q){
+            if($("#n_check"+q).is(':checked')==true){
+                $("#n_check2"+q).val("1");
+                check++;
+            }
+
+            else if($("#n_check"+q).is(':checked')==false){
+                $("#n_check2"+q).val("0");
+                check--;
+            }
+
+            if(check>1){
+                alert("대표 사진은 2개이상 선택 하실수 없습니다.")
+                $("#n_check"+q).attr('checked',false);
+                $("#n_check2"+q).val("0");
+                check--;
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    </script>
+
+
+
+
+
+
+    <script>
+        var create_model = function(){
+            $("#model_start").append("<table id='model"+model_count+"'><tr><th>" +
+            "<label for='model_name"+model_count+"'>모델명</label></th><td>" +
+            "<input type='text' class='form-control' id='model_name"+model_count+"' name='model_name["+model_count+"]'></td>" +
+            "</tr><tr><th>" +
+            "<label for='model_option"+model_count+"'>모델설명</label></th><td>" +
+            "<textarea rows='3' class='form-control' id='model_option"+model_count+"' name='model_option["+model_count+"]'></textarea>" +
+            "<button type='button' class='btn btn-del' style='float:right; margin-top:5px;' onclick='model_del("+model_count+")'>" +
+            "삭제</button></td></tr></table>");
+            model_count++;
+            model_count2++;
+        };
+
+
+        var model_del = function(value){
+            if(model_count2==1){
+                alert("모델등록은 1개 이상 있어야 합니다.")
+            }
+            else if(model_count2!==1){
+                var model_start = document.getElementById("model_start");
+                var model0 = document.getElementById("model" + value);
+                model_start.removeChild(model0); // 폼 삭제
+                model_count2--;
+            }
+        };
+
+        var kang = function(value){
+            if(model_count2==1){
+                alert("모델등록은 1개 이상 있어야 합니다.")
+            }
+            else if(model_count2!==1){
+                $("#old_model" + value).replaceWith("<div class='hidden'></div>");
+                $("#old_model_del"+value).val("1");
+                model_count2--;
+            }
+        };
+    </script>
+
+
+<script>
+
+    var category_edit = function(){
+        location.href = "/n_category_edit";
+
+    };
+
+    $(document).ready(function () {
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+        } else {
+            $('#listsee3').append("<button type='button' onclick='category_edit()' class='btn btn-edit' style='margin:0 30px 15px'>카테고리 편집</button>");
+        }
+    });
+</script>
+
+
+
+
+    <div class="page-info">
+        <div class="wrap">
+            <ul>
+                <li>
+                    <a href="/">홈 ></a>
+                </li>
+                <li>
+                    <a href="#">신제품소개 ></a>
+                </li>
+                <li>
+                    <a href="#">제품등록</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--/서브페이지 공통-->
+    <div class="wrap">
+        <!--좌측 메뉴-->
+        <div class="sidebar" id="listsee3">
+            <p>신제품 소개</p>
+            <ul id="liston2">
+                <!--<li>
+                    <span>|</span> 기타
+                    <ul>
+                        <li><a href="#">범용선반</a></li>
+                        <li><a href="#">범용밀링</a></li>
+                        <li><a href="#">레디알</a></li>
+                        <li><a href="#">성형연삭기</a></li>
+                    </ul>
+                </li>-->
+            </ul>
+            <!--<button class="btn btn-edit" type="button" style="margin:0 30px 15px;">카테고리 편집</button>-->
+        </div>
+
+
+
+        <div class="contents">
+            <h2><span>|</span> 신제품소개 > 물품수정</h2>
+            <div class="fix-height" style="margin-bottom: 0px; padding-left:0px;">
+                <form role="form" method="post" action="/product_update1" enctype="multipart/form-data" id="used" name="a" class="y-form">
+                    <input class="hidden" id="category_lv1_id" name="n_aaa">
+                    <input class="hidden" id="category_lv2_id" name="n_bbb">
+                    <input class="hidden" id="product_id" name="n_ccc">
+
+                    <input class="hidden"  name="model_name[0]" value="11">
+                    <input class="hidden"  name="model_option[0]" value="11">
+
+                    <!--장비등록-->
+                    <fieldset>
+                        <legend>
+                            장비등록
+                        </legend>
+                        <table>
+                            <tr>
+                                <th>
+                                    <label for="name">장비명</label></th>
+                                <td>
+                                    <input type="text" class="form-control"  id="name" name="n_name">
+                                </td>
+                                <th>
+                                    <label for="company">제조사</label>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" id="company" name="n_company">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="option">장비설명</label></th>
+                                <td colspan="3">
+                                    <textarea rows="3" class="form-control" id="option" name="n_option"></textarea></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="1231">첨부파일</label>
+                                </th>
+                                <td colspan="3">
+                                    <div id="addedForxsiv">
+                                        <div id="div1231">
+                                            <input type="File" name="file[0]" id="1231" onchange="selectFile(this,this.id);">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    파일리스트
+                                </th>
+                                <td colspan="3">
+                                    <div id="addedFormListDiv"></div>
+                                    <!--<a href="#">삭제</a> KakaoTalk_20150309_121741736.jpg<input type="checkbox" id="#" style="width: 15px; height: 15px; margin-left:10px;" value="0">대표사진-->
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    <!--/장비등록-->
+                    <!--모델등록-->
+                    <fieldset>
+                        <legend>
+                            모델등록
+                        </legend>
+                        <div id="c_button"></div>
+                        <!--<button type="button" class="btn btn-rg" style="float:right;">
+                            + 모델 등록 추가
+                        </button>-->
+                        <div id="model_start">
+                        </div>
+                    </fieldset>
+                    <!--/모델등록-->
+                </form>
+                <button type="button" class="btn btn-rg" style="float:right;" onclick="insert_go();">등록</button>
+            </div>
+        </div>
+
+    </div>

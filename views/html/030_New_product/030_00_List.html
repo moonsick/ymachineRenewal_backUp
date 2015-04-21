@@ -1,0 +1,238 @@
+<script type="text/javascript" src="scripts/pagenation.js"></script>
+<script>
+        var items = [];
+        var num = 1;
+        var pagedItemqq = [];
+        var cate_list = [];
+        var url;
+        var getValue;
+        var category1_code;
+        var category2_code;
+        var code1;
+        var code2;
+        var newtitle = [];
+
+        url = window.location;
+
+        if (String(url).indexOf("?") > 0) {
+            getValue = String(url).split('?');
+            getValue = getValue[1].split('&');
+
+            category1_code = getValue[0].split('='); //키와 값분리
+            category2_code = getValue[1].split('='); //키와 값분리
+
+
+            category1_code = category1_code[1];
+            category2_code = category2_code[1];
+            category2_code=category2_code.slice(0,2);
+
+
+            $.post('/newcontentimg', {category1_code: category1_code, category2_code: category2_code}, function (data) {      // 컨텐츠 중앙창 (10-10)
+                items = data.sending;
+                make_iii(num);
+                if((items.length % 5)==0){
+                    pagenation((items.length / 5)-1);
+                }
+                else{
+                    pagenation(items.length / 5);
+                }
+            });
+
+
+            var make_iii = function(num){
+
+                $('#liston').empty();
+                var n = 0;
+                for (var j = (num - 1) * 5; j < num * 5; j++) {
+                    if (items[j] != null) {
+                        pagedItemqq[n] = items[j];
+                    } else {
+                        pagedItemqq[n] = null;
+                    }
+                    n++;
+                }
+
+                for (var a=0 ; a<n; a++){
+                    if(pagedItemqq[a]!= null){
+
+                        var data = pagedItemqq[a].company;
+                        if(data = "(null)"){
+                            data=''; }
+
+
+
+                        $("#liston").append("<section class='media-ob'>" +
+                        "<a href='/New_productDetail?category1_code="+pagedItemqq[a].category1_code+'&category2_code='+pagedItemqq[a].category2_code+'&product_id='+pagedItemqq[a].product_id+"'" +"><img src='files/" + pagedItemqq[a].file_name + "'></a>" +
+                        "<div class='media-list'>" +
+                        "<p class='list-title'><a href='/New_productDetail?category1_code="+pagedItemqq[a].category1_code+'&category2_code='+pagedItemqq[a].category2_code+'&product_id='+pagedItemqq[a].product_id+"'" +">"+pagedItemqq[a].name+"</a></p>" +
+                        "<p class='list-body'>"+pagedItemqq[a].option+"</p></div></section>");
+                    }
+                }
+            };
+
+            var pagenation = function (paged) {
+                $('#page-selection').bootpag({
+                    total: paged + 1,
+                    page: 1,
+                    maxVisible: 5
+                }).on('page', function (event, num) {
+                    make_iii(num);
+                });
+            };
+
+
+
+
+            $.post('/newtitle', function (data) {      // 경로
+                newtitle = data.sending;
+                make_newtitle();
+                make_newtitle2();
+
+            });
+
+            var make_newtitle =function(){
+
+                for (var o = 0; o < newtitle.length; o++) {
+                    if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code=='00'){
+                        $("#newtitle1").append(">"+"&nbsp;"+newtitle[o].category2_name);
+                    }
+                    else if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code==category2_code) {
+                        $("#newtitle2").append('>'+'&nbsp;'+newtitle[o].category2_name);
+                    }
+                }
+            };
+            var make_newtitle2 =function(){
+
+                for (var o = 0; o < newtitle.length; o++) {
+                    if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code=='00'){
+                        $("#newtitle3").append(" "+newtitle[o].category2_name+">");
+                    }
+                    else if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code==category2_code) {
+                        $("#newtitle4").append('&nbsp;'+newtitle[o].category2_name+'>');
+                    }
+
+                }
+            };
+
+
+        }
+
+
+
+
+        $(document).ready(function () {
+            $.post('/newmenu', function (data) {      // 신제품 메뉴
+                cate_list = data.sending;
+                make_CateList();
+
+                /*
+                 pagenation(items.length / 5);
+                 */
+            });
+            var make_CateList = function () {
+                var id_insert;
+
+                for (var i = 0; i < cate_list.length; i++) {
+                    if (cate_list[i].category2_code == "00") {
+                        if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                            id_insert = cate_list[i].category1_code;
+                            $("#liston2").append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                        } else {
+                            id_insert = cate_list[i].category1_code;
+                            $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                        }
+                    }
+                    else {
+                        $("#"+id_insert).append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                    } } };
+        });
+
+    </script>
+
+
+<div>
+    <div class="page-info">
+        <div class="wrap">
+            <ul>
+                <li>
+                    <a href="/">홈 ></a>
+                </li>
+                <li>
+                    <a href="#">신제품소개 ></a>
+                </li>
+                <li>
+                    <a href="#" id="newtitle3"></a>
+                </li>
+                <li>
+                    <a href="#" id="newtitle4"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <div class="wrap">
+        <!--좌측 메뉴-->
+        <div class="sidebar" id="listsee2">
+            <p>신제품 소개</p>
+            <ul id="liston2">
+                <!--<li>
+                    <span>|</span> 기타
+                    <ul>
+                        <li><a href="#">범용선반</a></li>
+                        <li><a href="#">범용밀링</a></li>
+                        <li><a href="#">레디알</a></li>
+                        <li><a href="#">성형연삭기</a></li>
+                    </ul>
+                </li>-->
+            </ul>
+            <!--<button class="btn btn-edit" type="button" style="margin:0 30px 15px;">카테고리 편집</button>-->
+        </div>
+
+
+
+        <div>
+
+        <!--/좌측 메뉴-->
+        <div class="contents" id="listsee1">
+            <h2><span>|</span> 신제품 소개 &nbsp;<i id="newtitle1"></i>&nbsp; <i id="newtitle2"></i></h2>
+            <div id="liston">
+            <!--<section class="media-ob">
+                <a href="030-01-mc_product_detail.html"><img src="images/test01.png"></a>
+                <div class="media-list">
+                    <p class="list-title"><a href="030-01-mc_product_detail.html">B0385, B0385L</a></p>
+                    <p class="list-body">쓰가미 B0385, 쓰가미 B0385L</p>
+                </div>
+            </section>-->
+            </div>
+            <!--페이지네이션-->
+            <div id="page-selection"></div>
+            <!--/페이지네이션-->
+            <!--<button type="button" class="btn btn-rg" style="float:right;">등록</button>-->
+        </div>
+
+    </div>
+
+</div>
+    </div>
+<script>
+
+    var product_insert = function(){
+        location.href = "/New_productInsert";
+
+    };
+
+    var category_edit = function(){
+        location.href = "/n_category_edit";
+
+    };
+
+    $(document).ready(function () {
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+        } else {
+            $('#listsee1').append("<button type='button' onclick='product_insert()' class='btn btn-rg' style='float:right;'>등록</button>");
+            $('#listsee2').append("<button type='button' onclick='category_edit()' class='btn btn-edit' style='margin:0 30px 15px;'>카테고리 편집</button>");
+        }
+    });
+</script>

@@ -1,0 +1,296 @@
+<script type="text/javascript" src="scripts/pagenation.js"></script>
+
+    <script>
+        var qq = [];
+        var items = [];
+        var num = 1;
+        var pagedItemqq = [];
+        var items3 = [];
+        var num3 = 1;
+        var pagedItem3 = [];
+        var items2 = [];
+        var num2 = 1;
+        var pagedItem2 = [];
+        var cate_list = [];
+        var url;
+        var getValue;
+        var category1_code;
+        var category2_code;
+        var category3_code;
+        var menuimg = [];
+        var newtitle = [];
+        var recommend = [];
+        var Recommendation=[];
+        var code1;
+        var code2;
+
+        url1 = window.location;
+
+        if (String(url1).indexOf("?") > 0) {
+            getValue = String(url1).split('?');
+            // alert(getValue);
+            getValue = getValue[1].split('&');
+            // alert(getValue);
+            category1_code = getValue[0].split('='); //키와 값분리
+            //  alert(category1_code);
+            category2_code = getValue[1].split('='); //키와 값분리
+            /*            category3_code = getValue[2].split('='); //키와 값분리*/
+
+
+            // alert(category1_code);
+            category1_code = category1_code[1];
+
+            category2_code = category2_code[1];
+            category2_code=category2_code.slice(0,2);
+
+
+
+        }
+
+
+        $(document).ready(function () {
+
+            $.post('/Recommendation', function (data) {      // 추천메뉴
+                Recommendation = data.sending;
+                make_recommend();
+
+            });
+            var make_recommend = function () {
+                for(var i=0; i<Recommendation.length; i++){
+                    $("#Recommendation").append("<div class='thumnail'><a href='/Old_productDetail?category1_code="+ Recommendation[i].category1_code +"&category2_code="+Recommendation[i].category2_code+"&product_id="+Recommendation[i].product_id+"'"+">" +
+                    "<img src='files/"+Recommendation[i].file_name+"' alt='이미지'><p>"+Recommendation[i].name +"</p></a></div>");
+                };
+            }
+
+
+
+            $.post('/usemenu', function (data) {      // 중고제품 메뉴
+                cate_list = data.sending;
+                make_CateList();
+
+            });
+            var make_CateList = function () {
+
+                var id_insert;
+
+                for (var i = 0; i < cate_list.length; i++) {
+                    if (cate_list[i].category2_code == "00") {
+                        if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                            id_insert = cate_list[i].category1_code;
+                            $("#liston2").append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                        } else {
+                            id_insert = cate_list[i].category1_code;
+                            $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                        }
+                    }
+                    else {
+                        $("#"+id_insert).append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                    } } };
+
+
+            $.post('/usecontentimg', {category1_code: category1_code, category2_code: category2_code}, function (data) {      // 컨텐츠 중앙창 (10-10)
+                items = data.sending;
+                make_iii(num);
+                if((items.length % 5)==0){
+                    pagenation((items.length / 5)-1);
+                }
+                else{
+                    pagenation(items.length / 5);
+                }
+            });
+
+            var make_iii = function(num){
+
+                $('#liston').empty();
+                var n = 0;
+                for (var j = (num - 1) * 5; j < num * 5; j++) {
+                    if (items[j] != null) {
+                        pagedItemqq[n] = items[j];
+                    } else {
+                        pagedItemqq[n] = null;
+                    }
+                    n++;
+                }
+
+                for (var a=0 ; a<n; a++){
+                    if(pagedItemqq[a]!= null){
+
+                        var data = pagedItemqq[a].company;
+                        if(data = "(null)"){
+                            data=''; }
+
+                        $("#liston").append("<section class='media-ob'>" +
+                        "<a href='/Old_productDetail?category1_code="+pagedItemqq[a].category1_code+'&category2_code='+pagedItemqq[a].category2_code+'&product_id='+pagedItemqq[a].product_id+"'" +"><img src='files/" + pagedItemqq[a].file_name + "'></a>" +
+                        "<div class='media-list'>" +
+                        "<p class='list-title'><a href='/Old_productDetail?category1_code="+pagedItemqq[a].category1_code+'&category2_code='+pagedItemqq[a].category2_code+'&product_id='+pagedItemqq[a].product_id+"'" +">"+pagedItemqq[a].name+"</a></p>" +
+                        "<p class='list-body'>"+pagedItemqq[a].option+"</p></div></section>");
+
+                        /*  $("#recommend1").append("<div class='col-xs-12'><div class='media'>"+
+                         "<a href='/Old_productDetail?category1_code="+ pagedItemqq[a].category1_code +"&category2_code="+pagedItemqq[a].category2_code+"&product_id="+pagedItemqq[a].product_id+"'"+">" +  "<img src='files/"+pagedItemqq[a].file_name+"'  style='width:128px; height:100px;'>"+
+                         "<div class='media-body' style='text-align: left;'><h4 class='media-heading'>"+ pagedItemqq[a].name +"</h4><p></p></div></a></div></div>");*/
+                    }
+                }
+
+
+
+
+                /*  for(var j = (num - 1) * 5; j < num * 5; j++){
+                 $("#liston").append("<div class='media'>" + "<a href='/Old_productDetail?category1_code="+items[j].category1_code+'&category2_code='+items[j].category2_code+'&product_id='+items[j].product_id+"'" +"class='pull-left'>" + "<img src='files/" + items[j].file_name + "' " + " class='img-thumbnail' style='width:128px; height:100px;'/></a>" +
+                 "<div class='media-body'><h4 class='media-heading'><a href=" + '/Old_productDetail?category1_code=' + items[j].category1_code + '&category2_code=' + items[j].category2_code + '&product_id=' + items[j].product_id + ">"+items[j].company+"  "+items[j].name+ "</a></h4>" +items[j].option + "</div></div>");
+                 }*/
+            }
+
+
+
+            var pagenation = function (paged) {
+                $('#page-selection').bootpag({
+                    total: paged + 1,
+                    page: 1,
+                    maxVisible: 5
+                }).on('page', function (event, num) {
+                    make_iii(num);
+                });
+            };
+
+
+
+
+
+            $.post('/newtitle1', function (data) {      // 신제품 메뉴
+                newtitle = data.sending;
+                make_newtitle();
+
+            });
+
+            var make_newtitle =function(){
+
+                for (var o = 0; o < newtitle.length; o++) {
+                    if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code=='00'){
+                        $("#newtitle1").append('>'+' '+newtitle[o].category2_name);
+                    }
+                    else if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code==category2_code) {
+                        $("#newtitle2").append('>'+'&nbsp;'+newtitle[o].category2_name);
+                    }
+
+                    if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code=='00'){
+                        $("#newtitle3").append(' '+newtitle[o].category2_name+'>');
+                    }
+                    else if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code==category2_code) {
+                        $("#newtitle4").append('&nbsp;'+newtitle[o].category2_name+'>');
+                    }
+
+
+
+
+                }
+            }
+
+
+
+
+
+
+        });
+
+    </script>
+
+    <div class="page-info">
+        <div class="wrap">
+            <ul>
+                <li>
+                    <a href="/">홈 ></a>
+                </li>
+                <li>
+                    <a href="#">중고제품 소개 ></a>
+                </li>
+                <li>
+                    <a href="#" id="newtitle3"> </a>
+                </li>
+                <li>
+                    <a href="#" id="newtitle4"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--/서브페이지 공통-->
+    <div class="wrap">
+        <!--좌측 메뉴-->
+        <div class="sidebar" id="listsee2">
+            <p>중고제품 소개</p>
+            <ul id="liston2">
+                <!--<li>
+                    <span>|</span> 머시닝센터
+                    <ul>
+                        <li><a href="#">수직&문형 머시닝센터</a></li>
+                        <li><a href="#">수평형머시닝센터</a></li>
+                    </ul>
+                </li>-->
+            </ul>
+            <!--<button class="btn btn-edit" type="button" style="margin:0 30px 15px;">카테고리 편집</button>-->
+        </div>
+
+        <!--/좌측 메뉴-->
+        <div class="contents" id="listsee1">
+            <!--추천매물-->
+
+            <h2 style="float:left;"><span>|</span> 와이머신 추천매물</h2>
+            <div id="recommend_m"><!--<button type="button" class="btn btn-rg" style="float:right;">추천매물 관리</button>--></div>
+
+            <div class="rec-pd" id="Recommendation">
+                <!--<div class="thumnail"><a href="#"><img src="img/test01.png" alt="이미지"><p>두산 CNC선반</p></a></div>
+                <div class="thumnail"><a href="#"><img src="img/test02.png" alt="이미지"><p>도시바 보오링기 87년</p></a></div>-->
+            </div>
+            <!--/추천매물-->
+
+            <!--중고제품 리스트-->
+            <h2><span>|</span> 중고제품 소개 &nbsp;<i id="newtitle1"></i>&nbsp; <i id="newtitle2"></i></h2>
+            <div id="liston">
+            <!--<section class="media-ob">
+                <a href="030-01-mc_product_detail.html"><img src="img/test01.png"></a>
+                <div class="media-list">
+                    <p class="list-title"><a href="030-01-mc_product_detail.html">B0385, B0385L</a></p>
+                    <p class="list-body">쓰가미 B0385, 쓰가미 B0385L</p>
+                </div>
+            </section>-->
+            </div>
+            <!--/중고제품 리스트-->
+            <!--페이지네이션-->
+            <div id="page-selection"></div>
+            <!--/페이지네이션-->
+            <!--<button type="button" class="btn btn-rg" style="float:right;">등록</button>-->
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+<script>
+    var product_insert = function(){
+        location.href = "/Old_productInsert";
+
+    };
+
+    var category_edit = function(){
+        location.href = "/n_category_edit";
+
+    };
+
+    var recommend_go = function(){
+        location.href = "/Old_productRecommend";
+
+    }
+    $(document).ready(function () {
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+        } else {
+            $('#listsee1').append("<button type='button' onclick='product_insert()' class='btn btn-rg' style='float:right;'>등록</button>");
+            $('#listsee2').append("<button type='button' onclick='category_edit()' class='btn btn-edit' style='margin:0 30px 15px;'>카테고리 편집</button>");
+            $('#recommend_m').append("<button class='btn btn-rg' style='float: right;' onclick='recommend_go();'>추천매물 관리</button>");
+
+
+        }
+    });
+</script>

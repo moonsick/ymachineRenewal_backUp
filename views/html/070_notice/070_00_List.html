@@ -1,0 +1,89 @@
+<script type="text/javascript" src="scripts/pagenation.js"></script>
+
+
+<script>
+var notice_insert = function(){
+  location.href = "/noticeWrite"
+};
+    $(document).ready(function () {
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+        } else {
+            $('#listsee1').append("<button type='button' onclick='notice_insert()' class='btn btn-rg' style='float:right;'>등록</button>");
+        }
+
+
+
+
+
+        var items = [];
+        var num = 1;
+        var pagedItem = [];
+        $.post('/getlist1', function (data) {
+            items = data.sending;
+            divide(num);
+            pagenation((items.length-1) / 5);
+        });
+
+        var divide = function (num) {
+            var n = 0;
+            for (var i = (num - 1) * 5; i < num * 5; i++) {
+                if (items[i] != null) {
+                    pagedItem[n] = items[i];
+                } else {
+                    pagedItem[n] = null;
+                }
+                n++;
+            }
+            $('#liston').empty();
+            $(pagedItem).each(function (i) {
+                var id = this.id;
+
+
+                var title = this.title;
+                if (this.id != null) {
+                    $("#liston").append("<tr><td><a href='/noticeDetail?id=" + id + "'>"+this.title+"</a></td><td style='text-align:center '><a href='/noticeDetail?id=" + id + "'>"+this.writer+"</a></td><td style='text-align:center'><a href='/noticeDetail?id=" + id + "'>"+this.date+"</a></td>");
+                }
+            });
+
+        };
+        var pagenation = function (paged) {
+            $('#page-selection').bootpag({
+                total: paged + 1,
+                page: 1,
+                maxVisible: 10
+            }).on('page', function (event, num) {
+                divide(num);
+            });
+        };
+    });
+</script>
+
+
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">공지사항</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <div class="contents" id="listsee1">
+        <h2><span>|</span> 공지사항</h2>
+        <table class="table">
+            <thead>
+            <tr><th style="width:450px;">제목</th><th>작성자</th><th style="width:150px;">작성일</th></tr>
+            </thead>
+            <tbody id="liston">
+            </tbody>
+        </table>
+        <div id="page-selection"></div>
+    </div>
+
+</div>

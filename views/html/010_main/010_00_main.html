@@ -1,0 +1,185 @@
+<script>
+    var mainnotice = [];
+    var limitnotice = [];
+    var mainusecontentimg = [];
+    var item = [];
+
+    var category_edit = function(){
+        location.href = "/mainimg_edit";
+    }
+    $(document).ready(function () {
+
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+        } else {
+            $('#listsee2').append("<button onclick='category_edit()' type='button' class='btn btn-rg'>이미지 편집</button>");
+        }
+
+
+
+
+        $.post('/mainnotice', function (data) {      // 신제품 메뉴
+            mainnotice = data.sending;
+            make_mainnotice();
+        });
+        var make_mainnotice = function(){
+            for(var i= 0; i<mainnotice.length; i++) {
+                limitnotice = mainnotice[i].title;
+                var res = limitnotice.slice(0, 9);
+                if(mainnotice[i].title.length>9) {
+                    $("#mainnotice").append("<li><a href=" + 'notice_view11?id=' + mainnotice[i].id + ">" + res +'...' +"</a><span>" + mainnotice[i].date + "</span></li>");
+                }
+                else{
+                    $("#mainnotice").append("<li><a href=" + 'notice_view11?id=' + mainnotice[i].id + ">" + mainnotice[i].title + "</a><span>" + mainnotice[i].date + "</span></li>");
+                }
+            }}
+
+
+
+        $.post('/mainusecontentimg', function (data) {      // 신제품 메뉴
+            mainusecontentimg = data.sending;
+            make_mainusecontentimg();
+        });
+        var make_mainusecontentimg = function(){
+            for(var i=0; i<2; i++){
+                $("#mainusecontentimg").append("<div class='border-wrap'><a href='Old_productDetail?category1_code="+mainusecontentimg[i].category1_code+"&category2_code="+mainusecontentimg[i].category2_code+"&product_id="+mainusecontentimg[i].product_id+"'>"+
+                "<img src="+"'files/"+mainusecontentimg[i].file_name+"'" +"></a>"+
+                "<span><a href='Old_productDetail?category1_code="+mainusecontentimg[i].category1_code+"&category2_code="+mainusecontentimg[i].category2_code+"&product_id="+mainusecontentimg[i].product_id+"'"+ "style='font-size:1.1em; color:#2a6496;'>"+mainusecontentimg[i].name+"</a></span></div>");
+
+            }}
+
+
+
+        $.post('/main_img_list', function (data) {      // 신제품 메뉴
+            item = data.sending;
+            make_mid_img();
+            make_bottom_img();
+        });
+
+
+        var make_mid_img = function() {
+            if(item.length==1){
+                $("#main_slides").append("<div id='slides02'></div>")
+                $("#slides02").append("<img src='files/"+item[0].file_name+"' alt='#'>");
+                $("#slides02").append("<a href='#' class='slidesjs-previous slidesjs-navigation'><</a>" +
+                "<a href='#' class='slidesjs-next slidesjs-navigation'>></a>" +
+                "<ul class='slides-pagination'><li><a href='#'></a></li></ul>");
+            }
+            else{
+                for (var j = 0; j < item.length; j++) {
+                    $("#slides").append("<img src='files/"+item[j].file_name+"' alt='#'>");
+                }
+                $("#slides").append("<a href='#' class='slidesjs-previous slidesjs-navigation'><</a>" +
+                "<a href='#' class='slidesjs-next slidesjs-navigation'>></a>");
+                $(function() {
+                    $('#slides').slidesjs({
+                        height: 350,
+                        navigation: false,
+                        start: 1,
+                        play: {
+                            auto: true
+                        },
+                        effect: {
+                            slide: {
+                                // Slide effect settings.
+                                speed: 1500
+                                // [number] Speed in milliseconds of the slide animation.
+                            }
+                        }
+                    });
+                });
+            }
+        };
+
+        var make_bottom_img = function(){
+            for (var i = 0;i < item.length; i++){
+                $("#marquee").append("<img src='files/"+item[i].file_name+"' style='width:80px; padding:0 20px;'>");
+            }
+        };
+
+    });
+
+
+</script>
+
+
+
+
+
+
+
+
+<div class="wrap">
+    <!--캐러젤-->
+    <div class="container">
+        <div id="slides">
+            <!--<img src="img/test01.png" alt="#">
+            <a href="#" class="slidesjs-previous slidesjs-navigation"><</a>
+            <a href="#" class="slidesjs-next slidesjs-navigation">></a>-->
+        </div>
+    </div>
+    <!--/캐러젤-->
+    <div class="m-img" id="listsee2">
+        <marquee behavior="scroll" scrollamount="6" bgcolor="#f5f5f5" class="pd-slide" id="marquee">
+            <!--<img src="img/test01.png" style="width:80px; padding:0 20px;">-->
+        </marquee>
+        <!--<button type="button" class="btn btn-rg">이미지 편집</button>-->
+    </div>
+
+    <!--컨텐츠-->
+    <div>
+        <!--공지사항-->
+        <section class="section03">
+            <p><a href="notice_List11"><img src="img/main_section_01.png" alt="공지사항"></a>
+            </p>
+            <div class="border-wrap main01">
+                <p>
+                    <a href="noticeList">더보기 ></a>
+                </p>
+                <ol id="mainnotice">
+                   <!-- <li>
+                        <a href="#">공지사항입니다</a><span>2015-03-01</span>
+                    </li>-->
+                </ol>
+            </div>
+        </section>
+        <!--/공지사항-->
+        <!--영상-->
+        <section class="section03 main02">
+            <p><img src="img/main_section_02.png" alt="제품영상">
+            </p>
+            <div class="border-wrap">
+                <img src="img/play.png" alt="동영상">
+            </div>
+        </section>
+        <!--/영상-->
+        <!--중고장비-->
+        <section class="section03 main03">
+            <p><img src="img/main_section_03.png" alt="중고장비">
+            </p>
+            <div id="mainusecontentimg"></div>
+            <!--<div class="border-wrap">
+                <img src="img/test01.png" alt="동영상"><span><a href="#">마작 5축 가공기 2008 BT5010,000</a>	</span>
+            </div>-->
+        </section>
+        <!--/중고장비-->
+        <!--고객센터-->
+        <section class="section03 main04" style="margin-right:0;">
+            <p><img src="img/main_section_04.png" alt="고객센터">
+            </p>
+            <div class="border-wrap">
+                <img src="img/contact.PNG" alt="연락처">
+            </div>
+        </section>
+        <!--/고객센터-->
+    </div>
+    <!--/컨텐츠-->
+</div>
+
+
+
+
+
+<script src="scripts/jquery.slides.min.js"></script>
+
+
+<!-- SlidesJS Required: Initialize SlidesJS with a jQuery doc ready -->

@@ -1,0 +1,777 @@
+<script>
+    var new_old = 0;
+    var n_click = function(){
+        new_old =1;
+        var item2 = [];
+        $("#liston2").empty();
+        $("#ntitle").empty();
+        $("#ntitle").append("신제품 소개");
+
+        $('#Lmenu').empty();
+        $("#Lmenu").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu1').empty();
+        $("#Lmenu1").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu2').empty();
+        $("#Lmenu2").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu3').empty();
+        $("#Lmenu3").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu4').empty();
+        $("#Lmenu4").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $.post('/product_Lmenu', {new_old : new_old } ,function (data) {
+            item2 = data.sending;             // product_menu의 신호를 보내서 받은 데이터를 item[] 에 모두 담는다.
+            make_Lselectbox();
+        });
+        var make_Lselectbox = function() {
+            for (var i = 0; i < item2.length; i++) {
+                $("#Lmenu").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu1").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu2").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu3").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu4").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+            }
+        }
+
+        $.post('/newmenu', function (data) {      // 신제품 메뉴
+            cate_list = data.sending;
+            make_CateList();
+
+        });
+        var make_CateList = function () {
+            var id_insert;
+
+            for (var i = 0; i < cate_list.length; i++) {
+                if (cate_list[i].category2_code == "00") {
+                    if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    } else {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    }
+                }
+                else {
+                    $("#"+id_insert).append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                } }
+        };
+
+    };
+
+
+    var d_click = function(){
+        new_old =2;
+        var item2 = [];
+        $("#liston2").empty();
+        $("#ntitle").empty();
+        $("#ntitle").append("중고제품 소개");
+
+        $('#Lmenu').empty();
+        $("#Lmenu").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu1').empty();
+        $("#Lmenu1").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu2').empty();
+        $("#Lmenu2").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu3').empty();
+        $("#Lmenu3").append("<option value='대메뉴'>대메뉴 선택창</option>");
+
+        $('#Lmenu4').empty();
+        $("#Lmenu4").append("<option value='대메뉴'>대메뉴 선택창</option>");
+        $.post('/product_Lmenu', {new_old : new_old } ,function (data) {
+            item2 = data.sending;             // product_menu의 신호를 보내서 받은 데이터를 item[] 에 모두 담는다.
+            make_Lselectbox();
+        });
+        var make_Lselectbox = function() {
+            for (var i = 0; i < item2.length; i++) {
+                $("#Lmenu").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu1").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu2").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu3").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+                $("#Lmenu4").append("<option value='" + item2[i].category1_code + "'>" + item2[i].category1_name + "</option>");
+
+            }
+        }
+
+
+        $.post('/usemenu', function (data) {      // 중고제품 메뉴
+            cate_list = data.sending;
+            make_CateList();
+
+
+        });
+        var make_CateList = function () {
+            var id_insert;
+
+            for (var i = 0; i < cate_list.length; i++) {
+                if (cate_list[i].category2_code == "00") {
+                    if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    } else {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    }
+                }
+                else {
+                    $("#"+id_insert).append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                } }
+        };
+    }
+</script>
+
+
+
+
+<script>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    var smenuList = [];
+    function Smenugo() {        // 대메뉴 클릭시 소메뉴 출력
+
+
+
+        var Lmenu_val;
+        Lmenu_val = $("#Lmenu2").val();
+        if (Lmenu_val !== "대메뉴") {
+            $("#Smenu").empty();
+            $.post('/product_Smenu', {category_lv1_id: Lmenu_val,new_old:new_old}, function (data) {
+                smenuList = data.sending;
+                make_select_Smenu();
+            });
+        }
+    };
+    var make_select_Smenu = function(){
+        if(smenuList.length==1){
+            alert("대메뉴만 존재 합니다. 소메뉴를 만드신후 선택해 주세요.")
+            $("#Smenu").append("<option value='소메뉴'>소메뉴</option>");
+        }
+
+        for(j=1; j<smenuList.length;j++){
+            $("#Smenu").append("<option value='"+smenuList[j].category2_code+"'>"+smenuList[j].category2_name+"</option>");
+        }
+    };
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+
+
+<script>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    var item3 = [];
+    function Smenugo1() {    // 대메뉴 클릭시 소메뉴 출력
+        var Lmenu_val;
+        Lmenu_val = $("#Lmenu4").val();
+        if (Lmenu_val !== "대메뉴") {
+            $("#Smenu1").empty();
+            $.post('/product_Smenu', {category_lv1_id: Lmenu_val,new_old:new_old}, function (data) {
+                item3 = data.sending;
+                make_select_Smenu1();
+            });
+        }
+    };
+    var make_select_Smenu1 = function(){
+
+        if(item3.length==1){
+            alert("대메뉴만 존재 합니다. 소메뉴를 만드신후 선택해 주세요.")
+            $("#Smenu1").append("<option value='소메뉴'>소메뉴</option>");
+        }
+
+        for(j=1; j<item3.length;j++){
+            $("#Smenu1").append("<option value='"+item3[j].category2_code+"'>"+item3[j].category2_name+"</option>");
+        }
+    };
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+<script>
+    var no_click =function(){
+        if(new_old==0){
+            alert("편집할 카테고리의 메뉴를 선택하세요.")
+        }
+    }
+</script>
+
+
+
+<script>
+
+    function create_Lmenu_go() {
+        var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+        if ($("#C_Lmenu").val() == "") {             //  <body>안에 id="C_Lmenu" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert('생성할 대메뉴를 입력하세요.');        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#C_Lmenu").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+        if(new_old==0){
+            i=1;
+            alert('편집할 카타고리의 메뉴를 선택하세요');        // 물품명을 입력하라는 경고창을 띄운다.
+        }
+
+        if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+        {
+            if (confirm($("#C_Lmenu").val()+"로 입력하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("생성이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                $("#aa").val(new_old);
+                document.a.submit();
+
+            }
+        }
+    }
+
+</script>
+
+
+
+
+<script>
+    // <body> 안에 있는 등록 버튼을 누를시 (onclick="create_Smenu_go"를 찾으면 알수 있다.) 동작 되는 함수 이다.   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 이 함수의 역활은 1. input 창에서 대메뉴 입력시 입력 값을 받는다.
+    //                  2. 전부 입력이 됐을시  등록 하시겠습니까? 라는 문구로 마지막 절차를 확인한다.
+    //                  3. 입력창에 있는 정보들을 (대메뉴 입력값) 쿼리문으로 전달한다.
+    function create_Smenu_go() {
+        var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+
+        if ($("#Lmenu").val() == "대메뉴") {             //  <body>안에 id="C_Lmenu" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("대메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Lmenu").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if ($("#C_Smenu").val() == "") {             //  <body>안에 id="C_Lmenu" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("생성할 소메뉴를 입력하세요.");       // 물품명을 입력하라는 경고창을 띄운다.
+            $("#C_Smenu").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+        {
+            if (confirm($("#C_Smenu").val()+"로 입력하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("생성이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                $("#bb").val(new_old);
+                document.b.submit();
+
+            }
+        }
+    }///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+
+
+
+
+
+
+<script>
+    // <body> 안에 있는 등록 버튼을 누를시 (onclick="amend_Lmenu_go"를 찾으면 알수 있다.) 동작 되는 함수 이다.   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 이 함수의 역활은 1. input 창에서 대메뉴 입력시 입력 값을 받는다.
+    //                  2. 전부 입력이 됐을시  등록 하시겠습니까? 라는 문구로 마지막 절차를 확인한다.
+    //                  3. 입력창에 있는 정보들을 (대메뉴 입력값) 쿼리문으로 전달한다.
+    function amend_Lmenu_go() {
+        var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+
+        if ($("#Lmenu1").val() == "대메뉴") {             //  <body>안에 id="Lmenu1" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("대메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Lmenu1").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if ($("#A_Lmenu").val() == "") {             //  <body>안에 id="A_Lmenu" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("변경할 대메뉴를 입력하세요.");       // 물품명을 입력하라는 경고창을 띄운다.
+            $("#A_Lmenu").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+        {
+            if (confirm($("#A_Lmenu").val()+"로 수정하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("수정이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                $("#cc").val(new_old);
+                document.c.submit();
+
+            }
+        }
+    }///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+
+
+
+
+
+<script>
+    // <body> 안에 있는 등록 버튼을 누를시 (onclick="amend_Smenu_go"를 찾으면 알수 있다.) 동작 되는 함수 이다.   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 이 함수의 역활은 1. input 창에서 대메뉴 입력시 입력 값을 받는다.
+    //                  2. 전부 입력이 됐을시  등록 하시겠습니까? 라는 문구로 마지막 절차를 확인한다.
+    //                  3. 입력창에 있는 정보들을 (대메뉴 입력값) 쿼리문으로 전달한다.
+    function amend_Smenu_go() {
+        var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+
+        if ($("#Lmenu2").val() == "대메뉴") {             //  <body>안에 id="Lmenu2" 값이 "대메뉴" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("대메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Lmenu2").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+
+        if ($("#Smenu").val() == "소메뉴") {             //  <body>안에 id="Smenu" 값이 "소메뉴" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("소메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Smenu").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if ($("#A_Smenu").val() == "") {             //  <body>안에 id="A_Lmenu" 값이 "" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("변경할 소메뉴를 입력하세요.");       // 물품명을 입력하라는 경고창을 띄운다.
+            $("#A_Smenu").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+        {
+            if (confirm($("#A_Smenu").val()+"로 수정하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("수정이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                $("#dd").val(new_old);
+                document.d.submit();
+
+            }
+        }
+    }///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+
+
+<script>
+    // <body> 안에 있는 등록 버튼을 누를시 (onclick="delete_Lmenu_go"를 찾으면 알수 있다.) 동작 되는 함수 이다.   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 이 함수의 역활은 1. input 창에서 대메뉴 입력시 입력 값을 받는다.
+    //                  2. 전부 입력이 됐을시  등록 하시겠습니까? 라는 문구로 마지막 절차를 확인한다.
+    //                  3. 입력창에 있는 정보들을 (대메뉴 입력값) 쿼리문으로 전달한다.
+    function delete_Lmenu_go() {
+        var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+
+        if ($("#Lmenu3").val() == "대메뉴") {             //  <body>안에 id="Lmenu3" 값이 "대메뉴" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("대메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Lmenu3").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+
+
+        if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+        {
+            if (confirm("삭제하시겠습니까? 삭제시 모든 소메뉴, 등록 물품이 삭제 됩니다.")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("삭제가 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                $("#ee").val(new_old);
+                document.e.submit();
+            }
+        }
+    }///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+
+
+
+
+<script>
+    // <body> 안에 있는 등록 버튼을 누를시 (onclick="delete_Smenu_go"를 찾으면 알수 있다.) 동작 되는 함수 이다.   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 이 함수의 역활은 1. input 창에서 대메뉴 입력시 입력 값을 받는다.
+    //                  2. 전부 입력이 됐을시  등록 하시겠습니까? 라는 문구로 마지막 절차를 확인한다.
+    //                  3. 입력창에 있는 정보들을 (대메뉴 입력값) 쿼리문으로 전달한다.
+    function delete_Smenu_go() {
+        var i=0;                                    // 조건에 유/무를 판단하기 위한 변수
+
+
+        if ($("#Lmenu4").val() == "대메뉴") {             //  <body>안에 id="Lmenu4" 값이 "대메뉴" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("대메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Lmenu4").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if ($("#Smenu1").val() == "") {             //  <body>안에 id="Smenu1" 값이 "대메뉴" 일시 즉 아무것도 없을시 동작 된다.
+            i=1;                                    // i변수 안에서는 1을 넣는다.
+            alert("삭제할 소메뉴를 선택하세요.");        // 물품명을 입력하라는 경고창을 띄운다.
+            $("#Lmenu4").focus();                    // 물품명 입력창에 자동으로 커서가 클릭되어 있는다.
+            return;
+        }
+
+        if (item3.length==1) {
+            i=1;
+            alert("삭제 하실수 없습니다. 소메뉴는 반듯이 1개 이상 있어야 합니다.");
+            return;
+        }
+
+        if(i!=1)    // 만약에 i변수에 1이 아닐시에는, 즉  위에 모든 조건이 만족하여 i변수안에 1이 안들어 갔을 경우를 생각해 볼수 있다.
+        {
+            if (confirm("삭제하시겠습니까? 삭제시 모든 등록 물품이 삭제 됩니다.")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+                alert("삭제가 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+                $("#ff").val(new_old);
+                document.f.submit();
+            }
+        }
+    }///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+
+
+
+
+<script>
+
+    var cate_list = [];
+
+    $(document).ready(function () {
+        $.post('/newmenu', function (data) {      // 신제품 메뉴
+            cate_list = data.sending;
+            make_CateList();
+
+        });
+        var make_CateList = function () {
+            var id_insert;
+
+            for (var i = 0; i < cate_list.length; i++) {
+                if (cate_list[i].category2_code == "00") {
+                    if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    } else {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    }
+                }
+                else {
+                    $("#"+id_insert).append("<li><a href=" + 'New_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                } }
+        };
+    });
+
+</script>
+
+<script>
+    var category_edit = function(){
+        location.href = "/n_category_edit";
+
+    };
+</script>
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">카타고리 편집</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <!--좌측 메뉴-->
+    <div class="sidebar" id="liston3">
+        <p id="ntitle">
+            신제품 소개
+        </p>
+        <ul id="liston2">
+        </ul>
+    </div>
+    <!--/좌측 메뉴-->
+    <div class="contents">
+        <h2><span>|</span> 카테고리 편집</h2>
+        <div class="fix-height" style="margin-bottom: 0px; padding-left:0px;">
+            <p style="color:red;">
+                * 편집할 카테고리의 메뉴를 선택하세요.
+            </p>
+            <div style="border:2px solid #999999; margin-bottom:15px; padding:10px;">
+                <label class="radio-inline" style="padding:0 130px; border-right:2px dotted #999999;">
+                    <input type="radio" onclick="n_click()"  name="product2" id="inlineRadio1" value="option1">
+                    신제품 </label>
+                <label class="radio-inline" style="padding:0 130px;">
+                    <input type="radio" onclick="d_click()" name="product2" id="inlineRadio2" value="option2">
+                    중고제품 </label>
+            </div>
+            <div class="tabbable edit-tabs" id="tabs-885284">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#panel-r" data-toggle="tab">카타고리 생성</a>
+                    </li>
+                    <li>
+                        <a href="#panel-e" data-toggle="tab">카타고리 수정</a>
+                    </li>
+                    <li>
+                        <a href="#panel-d" data-toggle="tab">카타고리 삭제</a>
+                    </li>
+                </ul>
+                <br>
+                <div class="tab-content edit-content">
+                    <!--카테고리생성-->
+                    <div class="tab-pane tab-wrap active" id="panel-r">
+                        <div style="width:120px; padding-right:0; padding-left:0; float:left;" >
+                            <ul class="nav nav-pills nav-stacked" style="border:none;">
+                                <li class="active">
+                                    <a href="#lg-menu" data-toggle="tab">대메뉴 생성</a>
+                                </li>
+                                <li>
+                                    <a href="#sm-menu" data-toggle="tab">소메뉴 생성</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content" style="width:605px; border: 1px solid #cccccc; float:right; margin-top:14px;">
+                            <!--대메뉴생성-->
+                            <div class="tab-pane active" id="lg-menu">
+                                <p style="font-size: 12px; font-weight: 300; margin-bottom:20px;">
+                                    생성할 대메뉴 이름을 입력해 주세요
+                                </p>
+
+                                <div style="width:112px; font-weight: 600;margin-top:5px;  font-size: 13px; float:left; padding-left:15px;">
+                                    대메뉴 입력 :
+                                </div>
+                                <div style="width:260px; float:left;">
+                                    <form role="form" method="post" action="/product_catagory_Lmenu_c" name="a">
+                                        <input type="text" class="form-control" id="C_Lmenu" name="n_C_Lmenu"/>
+                                        <input type="text" class="hidden" id="aa" name="aa" value="">
+                                    </form>
+                                </div>
+                                <button type='button' class='btn btn-edit' style="margin-top: 40px; float:right;" onclick="create_Lmenu_go();">
+                                    생 성
+                                </button>
+                            </div>
+                            <!--/대메뉴생성-->
+                            <!--소메뉴생성-->
+                            <div class="tab-pane" id="sm-menu">
+
+                                <p style="font-size: 12px; font-weight: 300; margin-bottom:20px;">
+                                    대메뉴를 선택 후 생성할 소메뉴이름을 입력해 주세요
+                                </p>
+
+                                <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                    대메뉴 선택 :
+                                </div>
+                                <form role="form" method="post" action="/product_catagory_Smenu_c" name="b">
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control" onclick="no_click();" style="width:90%; height:30px; " name="n_Lmenu" id="Lmenu">
+                                            <option value="대메뉴">대메뉴 선택창</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="width:90px;margin-top:5px;  font-weight: 600; font-size: 13px; float:left; padding-left:15px;">
+                                        소메뉴 입력 :
+                                    </div>
+                                    <div style="width:160px; float:left;">
+                                        <input type="text" class="form-control input-sm" id="C_Smenu" name="n_C_Smenu"/>
+                                        <input type="text" class="hidden" id="bb" name="bb"/>
+                                    </div>
+                                </form>
+                                <button type='button' class='btn btn-edit' style="margin-top: 40px; float:right;" onclick="create_Smenu_go();">
+                                    생 성
+                                </button>
+                            </div>
+                            <!--/소메뉴생성-->
+                        </div>
+                    </div>
+                    <!--/카테고리생성-->
+
+                    <!--카테고리수정-->
+                    <div class="tab-pane tab-wrap" id="panel-e">
+                        <div style="width:120px; padding-right:0; padding-left:0; float:left;">
+                            <ul class="nav nav-pills nav-stacked" style="border:none;">
+                                <li class="active">
+                                    <a href="#e-lg-menu" data-toggle="tab">대메뉴 수정</a>
+                                </li>
+                                <li>
+                                    <a href="#e-sm-menu" data-toggle="tab">소메뉴 수정</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content" style="width:605px; border: 1px solid #cccccc; float:right; margin-top:14px;">
+                            <!--대메뉴수정-->
+                            <div class="tab-pane active" id="e-lg-menu">
+                                <p style="font-size: 12px; font-weight: 300; margin-bottom:20px;">
+                                    대메뉴를 선택후 변경 할 이름을 입력해 주세요
+                                </p>
+
+                                <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                    대메뉴 선택 :
+                                </div>
+                                <form role="form" method="post" action="/product_catagory_Lmenu_A" name="c">
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control" onclick="no_click();" style="width:90%; height:30px; " name="n_Lmenu1" id="Lmenu1">
+                                            <option value="대메뉴"  style="font-size: 10px;">대메뉴 선택창</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                        이름 변경 :
+                                    </div>
+                                    <div style="width:160px; float:left;">
+                                        <input type="text" class="form-control input-sm" id="A_Lmenu" name="n_A_Lmenu"/>
+                                        <input type="text" class="hidden" id="cc" name="cc"/>
+                                    </div>
+                                </form>
+                                <button type='button' class='btn btn-edit' style="margin-top: 40px; float:right;" onclick="amend_Lmenu_go();">
+                                    수 정
+                                </button>
+                            </div>
+                            <!--/대메뉴수정-->
+                            <!--소메뉴수정-->
+                            <div class="tab-pane" id="e-sm-menu">
+                                <form role="form" method="post" action="/product_catagory_Smenu_A" name="d">
+                                    <p style="font-size: 12px; font-weight: 300; margin-bottom:20px;">
+                                        대메뉴를 먼저 선택해 주세요
+                                    </p>
+
+                                    <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                        대메뉴 선택 :
+                                    </div>
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control" style="width:90%;" name="n_Lmenu2" id="Lmenu2" onchange="Smenugo();">
+                                            <option value="대메뉴">대메뉴 선택창</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="margin-top: 20px; overflow:hidden; width:100%;">
+                                        <p style="font-size: 12px; font-weight: 300; margin:20px 0;">
+                                            소메뉴를 선택 후 변경할 이름을 입력해 주세요
+                                        </p>
+                                    </div>
+
+                                    <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                        소메뉴 선택 :
+                                    </div>
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control" style="width:90%;" name="n_Smenu" id="Smenu">
+                                            <option value="소메뉴">소메뉴 선택창</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                        이름 변경 :
+                                    </div>
+                                    <div style="width:160px; float:left;">
+                                        <input type="text" class="form-control input-sm" id="A_Smenu" name="n_A_Smenu"/>
+                                        <input type="text" class="hidden" id="dd" name="dd">
+                                    </div>
+
+                                    <button type='button' class='btn btn-edit' style="margin-top: 40px; float:right;" onclick="amend_Smenu_go();">
+                                        수 정
+                                    </button>
+                                </form>
+                            </div>
+                            <!--/소메뉴수정-->
+                        </div>
+                    </div>
+                    <!--/카테고리수정-->
+
+                    <!--카테고리삭제-->
+                    <div class="tab-pane tab-wrap" id="panel-d">
+                        <div style="width:120px; padding-right:0; padding-left:0; float:left;">
+                            <ul class="nav nav-pills nav-stacked" style="border:none;">
+                                <li class="active">
+                                    <a href="#d-lg-menu" data-toggle="tab">대메뉴 삭제</a>
+                                </li>
+                                <li>
+                                    <a href="#d-sm-menu" data-toggle="tab">소메뉴 삭제</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content" style="width:605px; border: 1px solid #cccccc; float:right; margin-top:14px;">
+                            <!--대메뉴삭제-->
+                            <div class="tab-pane active" id="d-lg-menu">
+                                <p style="font-size: 12px; font-weight: 300;">
+                                    대메뉴 선택 후 삭제 버튼을 눌러주세요
+                                    <br>
+                                    <span style="font-size: 11px; color: red">대메뉴 삭제시 소메뉴, 등록 물품 모두가 삭제 됩니다</span>
+                                </p>
+                                <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                    대메뉴 선택 :
+                                </div>
+                                <form role="form" method="post" action="/product_catagory_Lmenu_D" name="e">
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control"  name="n_Lmenu3" id="Lmenu3" onclick="no_click()">
+                                            <option value="대메뉴"  style="font-size: 10px;">대메뉴 선택창</option>
+                                        </select>
+                                        <input type="text" class="hidden" id="ee" name="ee">
+                                    </div>
+                                </form>
+                                <button type='button' class='btn btn-del' style="margin-top: 40px; float:right;" onclick="delete_Lmenu_go();">
+                                    삭 제
+                                </button>
+                            </div>
+                            <!--/대메뉴삭제-->
+                            <!--소메뉴삭제-->
+                            <div class="tab-pane" id="d-sm-menu">
+
+                                <p style="font-size: 12px; font-weight: 300;">
+                                    대메뉴와 삭제할 소메뉴를 선택해 주세요
+                                    <br>
+                                    <span style="font-size: 11px; color: red;">소메뉴 삭제시 등록 물품 모두가 삭제 됩니다</span>
+                                </p>
+                                <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                    대메뉴 선택 :
+                                </div>
+                                <form role="form" method="post" action="/product_catagory_Smenu_D" name="f">
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control" style="width:90%;" name="n_Lmenu4" id="Lmenu4" onchange="Smenugo1();">
+                                            <option value="대메뉴"  style="font-size: 10px;">대메뉴 선택창</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="width:90px; margin-top:5px; font-weight: 600; font-size: 13px; float:left; padding-left:3px;">
+                                        소메뉴 선택 :
+                                    </div>
+                                    <div style="width:160px; float:left;">
+                                        <select class="form-control" style="width:90%;" name="n_Smenu1" id="Smenu1">
+                                            <option value=""  style="font-size: 10px;">소메뉴 선택창</option>
+                                        </select>
+                                        <input type="text" class="hidden" id="ff" name="ff">
+                                    </div>
+                                </form>
+                                <button type='button' class='btn btn-del' style="margin-top: 40px; float:right;" onclick="delete_Smenu_go();">
+                                    삭 제
+                                </button>
+                            </div>
+                            <!--/소메뉴삭제-->
+                        </div>
+                    </div>
+                    <!--/카테고리삭제-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

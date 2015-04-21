@@ -1,0 +1,322 @@
+<script>
+
+    var cate_list = [];
+    var item1 = [];
+    var item2 = [];
+
+    $(document).ready(function () {
+        $('#listsee3').append("<button type='button' onclick='category_edit()' class='btn btn-edit' style='margin:0 30px 15px'>카테고리 편집</button>");
+        $.post('/usemenu', function (data) {      // 중고제품 메뉴
+            cate_list = data.sending;
+            make_CateList();
+            make_sub_Recommend_menu();
+        });
+        var make_CateList = function () {
+            var id_insert;
+
+            for (var i = 0; i < cate_list.length; i++) {
+                if (cate_list[i].category2_code == "00") {
+                    if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    } else {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    }
+                }
+                else {
+                    $("#"+id_insert).append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                } }
+        };
+
+        var make_sub_Recommend_menu = function(){
+            for (var i = 0; i < cate_list.length; i++) {
+                if (cate_list[i].category2_code == "00") {
+                    if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                        $("#recommend_menu").append("<dt><a href='#' onclick=\"product_view('"+cate_list[i].category1_code+"','"+cate_list[i].category2_code+"'); return false\">"+cate_list[i].category2_name+"</a></dt>")
+                    } else {
+                        $("#recommend_menu").append("<dt>"+cate_list[i].category2_name+"</dt>");
+                    }
+                }
+                else {
+                    $("#recommend_menu").append("<dd><a href='#' onclick=\"product_view('"+cate_list[i].category1_code+"','"+cate_list[i].category2_code+"'); return false\">"+cate_list[i].category2_name+"</a></dd>")
+                }}};
+
+
+        $.post('/Recommendation', function (data) {      // 중고제품 메뉴
+            item2 = data.sending;
+            make_Recommend_menu();
+        });
+        var make_Recommend_menu = function(){
+            var nn=1;
+            for(var qa=0; qa<item2.length; qa++) {
+                var name_edit = item2[qa].name.slice(0, 8)+'...';
+
+                if (item2[qa].name.length > 10) {
+                    $('#d_recommend_insert').append("<li id='old_recommend" + nn + "'style='font-size: 14px;'>" + name_edit + "<span class='pull-right'>" +
+                    "<button style='margin-right:5px;' class='btn btn-default' type='button' onclick=\"product_detail('" + item2[qa].category1_code + "','" + item2[qa].category2_code + "','" + item2[qa].product_id + "')\">확인</button>" +
+                    "<button class='btn list-btn02' type='button' onclick=\"old_del(" + nn + ");\">삭제</button></span></li>" +
+                    "<input type='text' class='hidden' id='old_lv1"+qa+"' name='old_lv1[" + nn + "]' value='" + item2[qa].category1_code + "'>" +
+                    "<input type='text' class='hidden' id='old_lv2"+qa+"' name='old_lv2[" + nn + "]' value='" + item2[qa].category2_code + "'>" +
+                    "<input type='text' class='hidden' id='old_lv3"+qa+"' name='old_lv3[" + nn + "]' value='" + item2[qa].product_id + "'>" +
+                    "<input type='text' class='hidden' name='old_permission[" + nn + "]' id='old_permission" + nn + "' value='0'>");
+                    nn++;
+                }
+                else{
+                    $('#d_recommend_insert').append("<li id='old_recommend" + nn + "'style='font-size: 14px;'>" + item2[qa].name + "<span class='pull-right'>" +
+                    "<button style='margin-right:5px;' class='btn btn-default' type='button' onclick=\"product_detail('" + item2[qa].category1_code + "','" + item2[qa].category2_code + "','" + item2[qa].product_id + "')\">확인</button>" +
+                    "<button class='btn list-btn02' type='button' onclick=\"old_del(" + nn + ");\">삭제</button></span></li>" +
+                    "<input type='text' class='hidden' id='old_lv1"+qa+"' name='old_lv1[" + nn + "]' value='" + item2[qa].category1_code + "'>" +
+                    "<input type='text' class='hidden' id='old_lv2"+qa+"' name='old_lv2[" + nn + "]' value='" + item2[qa].category2_code + "'>" +
+                    "<input type='text' class='hidden' id='old_lv3"+qa+"' name='old_lv3[" + nn + "]' value='" + item2[qa].product_id + "'>" +
+                    "<input type='text' class='hidden' name='old_permission[" + nn + "]' id='old_permission" + nn + "' value='0'>");
+                    nn++;
+                }
+            }
+            max_recommend=max_recommend+item2.length;
+            total_count=total_count+item2.length;
+        }
+
+    });
+
+</script>
+
+<script>
+    var max_recommend=0;
+    var new_recommend_count=0;
+    var new_lv_count=1;
+    var total_count=1;
+    var recommend_menuinsert = function(lv1,lv2,lv3,name){
+        if(max_recommend==8){
+            alert("추천매물은 8개를 넘어갈수 없습니다.")
+        }
+        else {
+            var flag=0;
+            for(var qe=0; qe<total_count;qe++){
+                if(lv1==$("#old_lv1"+qe).val()&&lv2==$("#old_lv2"+qe).val()&&lv3==$("#old_lv3"+qe).val()){
+                    alert("같은 물품이 존재합니다.")
+                    flag=1;
+                }
+
+            }
+
+
+            if(flag==0) {
+                for (var qe = 0; qe < total_count; qe++) {
+
+
+                    if (lv1 == $("#new_lv1" + qe).val() && lv2 == $("#new_lv2" + qe).val() && lv3 == $("#new_lv3" + qe).val()) {
+                        alert("같은 물품이 존재합니다.")
+                        flag = 1;
+                    }
+
+                }
+            }
+
+            if(flag==0){
+                $('#d_recommend_insert').append("<li id='new_recommend" + new_lv_count + "'style='font-size: 14px;'>" + name + "<span class='pull-right'>" +
+                "<button style='margin-right:5px;' class='btn btn-default' onclick=\"product_detail('" + lv1 + "','" + lv2 + "','" + lv3 + "')\">확인</button>" +
+                "<button class='btn list-btn02' onclick='new_del(" + new_lv_count + ");'>삭제</button></span>" +
+                "<input type='text' class='hidden' id='new_lv1"+new_lv_count+"' name='new_lv1["+new_lv_count+"]' value='" + lv1 + "'>" +
+                "<input type='text' class='hidden' id='new_lv2"+new_lv_count+"' name='new_lv2["+new_lv_count+"]' value='" + lv2 + "'>" +
+                "<input type='text' class='hidden' id='new_lv3"+new_lv_count+"' name='new_lv3["+new_lv_count+"]' value='" + lv3 + "'></li>");
+                new_recommend_count++;
+                max_recommend++;
+                new_lv_count++;
+                total_count++;
+
+            }
+
+
+        }
+    };
+
+    var new_del = function(count){
+        var addedFormList = document.getElementById("d_recommend_insert");
+        addedFormList.removeChild(document.getElementById("new_recommend"+count));
+        max_recommend--;
+    };
+
+
+    var old_del = function(count){
+        $("#old_recommend" + count).replaceWith("<div class='hidden'></div>");
+        $("#old_permission"+count).val(1);
+        max_recommend--;
+    };
+
+</script>
+
+<script>
+    var product_view = function (a,b){
+        $.post('/product_view',{lv1_id:a,lv2_id:b},function (data) {      // 중고제품 메뉴
+            item1 = data.sending;
+            make_product_view();
+        });
+
+        var make_product_view = function(){
+            $("#d_product_view").empty();
+            for(var qw=0; qw<item1.length; qw++){
+                if(item1.length==1){
+                    alert("제품이 존제하지 않습니다.")
+                }
+                else {
+                    if(item1[qw].product_id!=='00') {
+                        if (item1[qw].name.length > 10) {
+                            var name_edit = item1[qw].name.slice(0, 8)+'...';
+                            $("#d_product_view").append("<li style='font-size: 14px;'>" + item1[qw].name.slice(0, 8) + '...' + "<span class='pull-right'>" +
+                            "<button type='button' style='margin-right:5px;' class='btn' onclick=\"product_detail('" + item1[qw].category1_code + "','" + item1[qw].category2_code + "','" + item1[qw].product_id + "')\">확인</button>" +
+                            "<button type='button' class='btn list-btn02' onclick=\"recommend_menuinsert('"+item1[qw].category1_code+"','"+item1[qw].category2_code+"','"+item1[qw].product_id+"','"+name_edit+"');\">추가</button></span></li>");
+                        }
+                        else {
+                            $("#d_product_view").append("<li style='font-size: 14px;'>" + item1[qw].name + "<span class='pull-right'>" +
+                            "<button type='button' style='margin-right:5px;' class='btn' onclick=\"product_detail('"+ item1[qw].category1_code + "','" + item1[qw].category2_code + "','" + item1[qw].product_id + "')\">확인</button>" +
+                            "<button type='button' class='btn list-btn02' onclick=\"recommend_menuinsert('"+item1[qw].category1_code+"','"+item1[qw].category2_code+"','"+item1[qw].product_id+"','"+item1[qw].name+"');\">추가</button></span></li>");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var product_detail = function(a,b,c){
+        var url ="/Old_productDetail?category1_code="+a+"&category2_code="+b+"&product_id="+c;
+        void(window.open(url,'','width=1500, height=900'));
+    }
+
+</script>
+
+
+<script>
+    var insert_go = function() {
+        if (confirm("저장하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+            alert("저장이 완료되었습니다.")       // 예 문구를 누를시 동작 된다. 경고창으로 완료 되었다고 뜬다.
+            document.a.submit();
+        }
+    };
+</script>
+
+
+<!--서브페이지 공통-->
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">중고제품 ></a>
+            </li>
+            <li>
+                <a href="#">추천매물 등록</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <!--좌측 메뉴-->
+    <div class="sidebar" id="listsee3">
+        <p>중고제품 소개</p>
+        <ul id="liston2">
+            <!--<li>
+                <span>|</span> 기타
+                <ul>
+                    <li><a href="#">범용선반</a></li>
+                    <li><a href="#">범용밀링</a></li>
+                    <li><a href="#">레디알</a></li>
+                    <li><a href="#">성형연삭기</a></li>
+                </ul>
+            </li>-->
+        </ul>
+        <!--<button class="btn btn-edit" type="button" style="margin:0 30px 15px;">카테고리 편집</button>-->
+    </div>
+
+    <!--/좌측 메뉴-->
+    <div class="contents">
+        <!--추천매물-->
+        <h2><span>|</span> 추천매물 등록</h2>
+        <div class="recom-wrap">
+            <div class="recommend-edit">
+                <h5>카테고리</h5>
+                <dl class="cata-select" id="recommend_menu">
+                    <!--<dt>머시닝센터</dt>
+                    <dd><a href="#">수직&문형머시닝센터</a></dd>
+                    <dd><a href="#">수평형머시닝센터</a></dd>
+                    <dt>CNC 선반</dt>
+                    <dd><a href="#">수직형 cnc선반</a></dd>
+                    <dd><a href="#">수평형 cnc선반</a></dd>
+                    <dt><a href="#">범용선반</a></dt>
+                    <dt><a href="#">범용 밀링</a></dt>
+                    <dd><a href="#">cnc밀링</a></dd>
+                    <dt><a href="#">연마기</a></dt>
+                    <dt><a href="#">방전기</a></dt>
+                    <dd><a href="#">기타</a></dd>
+                    <dt>머시닝센터</dt>
+                    <dd><a href="#">수직&문형머시닝센터</a></dd>
+                    <dd><a href="#">수평형머시닝센터</a></dd>
+                    <dt>CNC 선반</dt>
+                    <dd><a href="#">수직형 cnc선반</a></dd>
+                    <dd><a href="#">수평형 cnc선반</a></dd>
+                    <dt><a href="#">범용선반</a></dt>
+                    <dt><a href="#">범용 밀링</a></dt>
+                    <dd><a href="#">cnc밀링</a></dd>
+                    <dt><a href="#">연마기</a></dt>
+                    <dt><a href="#">방전기</a></dt>
+                    <dd><a href="#">기타</a></dd>-->
+                </dl>
+            </div>
+        </div>
+
+        <form role="form" method="post" action="/recommend_insert" enctype="multipart/form-data" id="used" name="a">
+            <input type='text' class='hidden' name='old_lv1[0]' value="11">
+            <input type='text' class='hidden' name='old_lv2[0]' value="11">
+            <input type='text' class='hidden' name='old_lv3[0]' value="11">
+            <input type='text' class='hidden' name='old_permission[0]' id='old_permission0' value='0'>
+            <input type='text' class='hidden' name='new_lv1[0]' value="11">
+            <input type='text' class='hidden' name='new_lv2[0]' value="11">
+            <input type='text' class='hidden' name='new_lv3[0]' value="11">
+
+        <div class="recom-wrap">
+            <h5>제품명</h5>
+            <p class="p-red">'확인'을 누르시면 제품 이미지를 보실 수 있습니다.</p>
+            <ul class="list-unstyled prd-select" id="d_product_view">
+                <!--<li>aaaaa
+                        <span class="pull-right">
+                       <a href="#"><button class="btn">확인</button></a>
+                        <a href="#"><button class="btn list-btn02">추가</button></a>
+                    </span></li>
+                <li>aaaaa
+                        <span class="pull-right">
+                      <a href="#"><button class="btn btn-default">확인</button></a>
+                        <a href="#"><button class="btn list-btn02">추가</button></a>
+                    </span></li>
+                <li>aaaaa
+                        <span class="pull-right">
+                        <a href="#"><button class="btn btn-default">확인</button></a>
+                        <a href="#"><button class="btn list-btn02">추가</button></a>
+                    </span></li>-->
+            </ul>
+        </div>
+
+        <div class="recom-wrap">
+            <h5>추천매물 등록</h5>
+            <p class="p-red">'확인'을 누르시면 제품 이미지를 보실 수 있습니다.</p>
+            <ul class="list-unstyled recoman-pro" id="d_recommend_insert">
+                <!--<li>aaaaa <span class="pull-right">
+                        <a href="#"><button class="btn btn-default">확인</button></a>
+                        <a href="#"> <button class="btn list-btn02">삭제</button></a>
+                    </span></li>
+                <li>aaaaa <span class="pull-right">
+                         <a href="#"><button class="btn btn-default">확인</button></a>
+                         <a href="#"><button class="btn list-btn02">삭제</button></a>
+                    </span></li>-->
+            </ul>
+        </div>
+</form>
+
+        <button class="btn pull-right list-btn02" style="float:right;" onclick="insert_go();">저장</button>
+    </div>
+
+
+
+</div>

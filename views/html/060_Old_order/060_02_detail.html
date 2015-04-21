@@ -1,0 +1,116 @@
+<script>
+    $(document).ready(function () {
+        var title = document.getElementById('usedInputTitle');
+        var writer = document.getElementById('usedInputname');
+        var company = document.getElementById('usedInputCompany');
+        var contact = document.getElementById('usedInputCall');
+        var email = document.getElementById('usedInputEmail');
+        var content = document.getElementById('usedInputContent');
+        var id2 = document.getElementById('id');
+        var url = window.location.href;
+        var id = url.indexOf('?');
+        var send = url.slice(id + 4);
+        $.post('/getboard2', {id: send}, function (data) {
+            var existExtArray = [];
+            var message = data.sending[0];
+            id2.value = send;
+            title.value = message.title;
+            writer.value = message.writer;
+            company.value = message.company;
+            contact.value = message.contact;
+            email.value = message.email;
+            content.value = message.content;
+            var up = [];
+
+            if(message.file==null){
+
+            }
+            else{
+                existExtArray = message.file.split('*');
+                for (var i=0; i < existExtArray.length-1; i++) {
+                    var j = existExtArray[i].substring(91);
+                    $("#download").append("<button class='btn ' type='submit' id='up"+i+"' name='up'>"+j+"</button><br/>");
+                    up[i] = document.getElementById('up'+i);
+                    up[i].value = existExtArray[i];
+                }
+            }
+        });
+    });
+
+</script>
+
+
+<script>
+    function btn_click(){
+        if(confirm("삭제 하시겠습니까?")) {
+            $(document).ready(function () {
+                var url = window.location.href;
+                var id = url.indexOf('?');
+                var send = url.slice(id + 4);
+                $.post('/deleteboard2', {id: send}, function (data) {
+                    window.location.href = "/oldOrderList";
+                });
+            });
+        }
+    }
+
+    var Listgo = function(){
+        location.href="/oldOrderList"
+    }
+</script>
+
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">중고장비문의</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <div class="contents">
+        <h2><span>|</span> 중고장비문의</h2>
+        <div class="y-form c-write">
+            <label for="usedInputTitle">제목</label>
+            <input type="text" class="form-control" id="usedInputTitle" readonly="readonly">
+            <div style="width:48%; float:left;">
+                <label for="usedInputname">작성자</label>
+                <input type="text" class="form-control" id="usedInputname" readonly="readonly"></div>
+            <div style="width:48%; float:right; padding-right:10px;">
+                <label for="usedInputCall">연락처</label>
+                <input type="tel" class="form-control" id="usedInputCall" readonly="readonly"></div>
+            <div style="width:48%; float:left;">
+                <label for="usedInputCompany">업체명</label>
+                <input type="tel" class="form-control" id="usedInputCompany" readonly="readonly">
+            </div>
+            <div style="width:48%; float:right;padding-right:10px;">
+                <label for="usedInputEmail">이메일</label>
+                <input type="tel" class="form-control" id="usedInputEmail" readonly="readonly">
+            </div>
+            <div style="clear:both;">
+                <label for="usedInputContent">내용</label>
+                <textarea class="form-control" id="usedInputContent" rows="7" readonly="readonly"></textarea>
+            </div>
+            <label>파일리스트</label>
+            <div class="myfilelist">
+                <form action="/download2"  method="post" >
+                    <div id="download"></div>
+                </form>
+            </div>
+
+
+
+        </div>
+        <div class="pull-right" style="margin:15px;">
+            <button type="button" class="btn btn-edit" onclick="Listgo()">목록</button>
+            <button type="button" class="btn btn-del" onclick="btn_click()">삭제</button>
+            <input type="hidden"  name="id" id="id">
+        </div>
+    </div>
+</div>

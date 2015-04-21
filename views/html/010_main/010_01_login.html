@@ -1,0 +1,20 @@
+<script>
+    var chkProcess = function () {
+        var account = $('#account').val();
+        var pswd = $('#pswd').val();
+        $.post('/getdata', {account: account, pswd: pswd}, function (data) {
+            sessionStorage.setItem('name', data.sending[0].name);
+            sessionStorage.setItem('role', data.sending[0].role);
+            history.back();
+        });
+    };
+</script>
+
+<div class="wrap">
+    <form class="login-form">
+        <label><img src="img/login-title.png"></label>
+        <input type="text" placeholder="아이디" class="form-control" id="account">
+        <input type="password" placeholder="비밀번호" class="form-control" id="pswd">
+        <button class="btn btn-login" type="button" onclick="chkProcess();">로그인</button>
+    </form>
+</div>

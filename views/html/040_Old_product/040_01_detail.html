@@ -1,0 +1,332 @@
+<script>
+    $(document).ready(function () {
+        if (sessionStorage.getItem('name') == null || sessionStorage.getItem('name') == '') {
+            $('#listsee1').append("<button type='button' onclick='go_back();' class='btn btn-list'>목록</button>");
+        } else {
+            $('#listsee1').append("<button type='button' onclick='del_go();' class='btn btn-del' style='margin-right: 10px'>삭제</button>");
+            $('#listsee1').append("<button type='button' onclick='go_Amend();' class='btn btn-edit' style='margin-right: 10px'>수정</button>");
+            $('#listsee1').append("<button type='button' onclick='go_back();' class='btn btn-list'>목록</button>");
+            $('#listsee3').append("<button type='button' onclick='category_edit()' class='btn btn-edit' style='margin:0 30px 15px'>카테고리 편집</button>");
+        }
+    });
+
+    var go_Amend = function(){
+        location.href = "/Old_productModification?category1_code="+category1_code+"&category2_code="+category2_code+"&product_id="+category3_code;
+    };
+</script>
+
+<script>
+    var qq = [];
+    var items = [];
+    var num = 1;
+    var pagedItem = [];
+    var items3 = [];
+    var num3 = 1;
+    var pagedItem3 = [];
+    var items2 = [];
+    var num2 = 1;
+    var pagedItem2 = [];
+    var cate_list = [];
+    var viewtittle1 = [];
+    var url;
+    var getValue;
+    var category1_code;
+    var category2_code;
+    var category3_code;
+    var newtitle = [];
+
+    var product_id;
+    var code1;
+    var code2;
+    var url = window.location.href;
+
+    getValue = String(url).split('?');
+    getValue = getValue[1].split('&');
+    category1_code = getValue[0].split('='); //키와 값분리
+    category2_code = getValue[1].split('='); //키와 값분리
+    category3_code = getValue[2].split('='); //키와 값분리
+
+    category1_code = category1_code[1];
+    category2_code = category2_code[1];
+    category3_code = category3_code[1];
+    category3_code = category3_code.slice(0,2);
+    $(document).ready(function () {
+
+
+
+        $.post('/newtitle1', function (data) {      // 신제품 메뉴
+            newtitle = data.sending;
+            make_newtitle();
+
+        });
+
+        var make_newtitle =function(){
+
+            for (var o = 0; o < newtitle.length; o++) {
+                if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code=='00'){
+                    $("#newtitle3").append(' '+newtitle[o].category2_name+'>');
+                }
+                else if(newtitle[o].category1_code==category1_code&&newtitle[o].category2_code==category2_code) {
+                    $("#newtitle4").append('&nbsp;'+newtitle[o].category2_name+'>');
+                }}
+        }
+
+
+
+        $.post('/usemenu', function (data) {      // 신제품 메뉴
+            cate_list = data.sending;
+            make_CateList();
+
+            /*
+             pagenation(items.length / 5);
+             */
+        });
+        var make_CateList = function () {
+            var id_insert;
+
+            for (var i = 0; i < cate_list.length; i++) {
+                if (cate_list[i].category2_code == "00") {
+                    if (i==(cate_list.length-1)||cate_list[i + 1].category2_code == "00") {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + "><span>|</span> "+cate_list[i].category2_name+"</a><ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    } else {
+                        id_insert = cate_list[i].category1_code;
+                        $("#liston2").append("<li><span>|</span> "+cate_list[i].category2_name+"<ul id='"+cate_list[i].category1_code+"'></ul></li>");
+                    }
+                }
+                else {
+                    $("#"+id_insert).append("<li><a href=" + 'Old_productList?category1_code=' + cate_list[i].category1_code + '&category2_code=' + cate_list[i].category2_code + ">"+cate_list[i].category2_name+"</a></li>")
+                } } };
+
+
+
+
+
+        $.post('/usedetail', {code1 :category1_code, code2 : category2_code , code3 : category3_code}, function (data) {
+            items = data.sending;
+            make_newdetail();
+
+        });
+
+        var make_newdetail = function () {
+            for (var j = 0; j < items.length; j++) {
+                if(items[j].product_model_option==null){
+                    $("#modelList").append("<div class='list-item'>" +
+                    "<p class='m-title'><a href='#'>"+items[j].product_model_name+"</a></p>" +
+                    "<div class='m-body' id='model"+j+"'><br></div></div>");
+                }
+                else{
+                    $("#modelList").append("<div class='list-item'>" +
+                    "<p class='m-title'><a href='#'>"+items[j].product_model_name+"</a></p>" +
+                    "<div class='m-body' id='model"+j+"'><br></div></div>");
+                    var option = items[j].product_model_option.replace(/\n/gi,"<br>")
+                    $("#model"+j).append(option);
+                }
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+        $.post('/usedetailimg', {code1 :category1_code, code2 : category2_code , code3 : category3_code}, function (data) {
+            itemsimg = data.sending;
+            make_newdetailimg();
+            make_marquee();
+        });
+
+        var make_newdetailimg = function() {
+            if(itemsimg.length==1){
+                $("#main_slides").append("<div id='slides02'></div>")
+                $("#slides02").append("<img src='files/"+itemsimg[0].file_name+"' alt='#'>");
+                $("#slides02").append("<a href='#' class='slidesjs-previous slidesjs-navigation'><</a>" +
+                "<a href='#' class='slidesjs-next slidesjs-navigation'>></a>" +
+                "<ul class='slides-pagination'><li><a href='#'></a></li></ul>");
+            }
+            else{
+                for (var j = 0; j < itemsimg.length; j++) {
+                    $("#slides").append("<img src='files/"+itemsimg[j].file_name+"' alt='#'>");
+                }
+                $("#slides").append("<a href='#' class='slidesjs-previous slidesjs-navigation'><</a>" +
+                "<a href='#' class='slidesjs-next slidesjs-navigation'>></a>");
+                $(function() {
+                    $('#slides').slidesjs({
+                        height: 350,
+                        navigation: false,
+                        start: 1,
+                        play: {
+                            auto: true
+                        },
+                        effect: {
+                            slide: {
+                                // Slide effect settings.
+                                speed: 1500
+                                // [number] Speed in milliseconds of the slide animation.
+                            }
+                        }
+                    });
+                });
+            }
+        };
+
+        var make_marquee = function(){
+            for (var i = 0;i < itemsimg.length; i++){
+                $("#marquee").append("<a href='#' onclick='marqueeClick("+i+")'><img src='files/"+itemsimg[i].file_name+"' style='height:80px; '></a>");
+            }
+        };
+
+
+
+        $.post('/viewtittle4', {code1 :category1_code, code2 : category2_code , code3 : category3_code}, function (data) {
+            viewtittle1 = data.sending;
+            make_viewtittle();
+        });
+
+        var make_viewtittle = function(){
+            $("#viewti").append(viewtittle1[0].name);
+        }
+    });
+
+    var del_go = function() {
+        if (confirm("삭제를 하시겠습니까?")) {       // confirm 이란 함수이다.  confirm이란? 마지막으로 한번더 확인 절차를 해주는 함수이다.   입력하시겠습니까? 라는 경고창과 함께 예/아니오 를 고를수 있다.
+            alert("삭제가 완료되었습니다.");
+            $.post('/d_product_del', {code1: category1_code, code2: category2_code, code3: category3_code} ,function (data) {      // 신제품 메뉴
+                        history.go(-1);
+                    }
+
+            )
+        }
+    }
+</script>
+
+
+<script>
+    var category_edit = function(){
+        location.href = "/n_category_edit";
+
+    };
+
+    var go_back = function(){
+        history.go(-1);
+    }
+
+    var marqueeClick = function(num){
+        if(num==0){
+            $("#id0").trigger('click');
+        }
+        if(num==1){
+            $("#id1").trigger('click');
+        }
+        if(num==2){
+            $("#id2").trigger('click');
+        }
+        if(num==3){
+            $("#id3").trigger('click');
+        }
+        if(num==4){
+            $("#id4").trigger('click');
+        }
+        if(num==5){
+            $("#id5").trigger('click');
+        }
+        if(num==6){
+            $("#id6").trigger('click');
+        }
+        if(num==7){
+            $("#id7").trigger('click');
+        }
+    };
+</script>
+
+
+
+
+<div class="page-info">
+    <div class="wrap">
+        <ul>
+            <li>
+                <a href="/">홈 ></a>
+            </li>
+            <li>
+                <a href="#">중고제품 소개 </a>
+            </li>
+            <li>
+                <a href="#" id="newtitle3"> ></a>
+            </li>
+            <li>
+                <a href="#" id="newtitle4"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--/서브페이지 공통-->
+<div class="wrap">
+    <!--좌측 메뉴-->
+    <div class="sidebar" id="listsee3">
+        <p>중고제품 소개</p>
+        <ul id="liston2">
+            <!--<li>
+                <span>|</span> 기타
+                <ul>
+                    <li><a href="#">범용선반</a></li>
+                    <li><a href="#">범용밀링</a></li>
+                    <li><a href="#">레디알</a></li>
+                    <li><a href="#">성형연삭기</a></li>
+                </ul>
+            </li>-->
+        </ul>
+        <!--<button class="btn btn-edit" type="button" style="margin:0 30px 15px;">카테고리 편집</button>-->
+    </div>
+
+    <!--/좌측 메뉴-->
+    <div class="contents">
+        <p class="list-title"><a id="viewti"></a></p>
+        <hr>
+        <h2 style="margin:15px 0;"><span>|</span> 장비이미지</h2>
+        <!--캐러젤-상세보기-->
+        <div class="img-slide">
+            <div class="container" id="main_slides">
+                <div id="slides">
+                    <!--<img src="img/test01.png" alt="#">
+                    <img src="img/test02.png" alt="#">
+                    <img src="img/test03.png" alt="#">
+                    <a href="#" class="slidesjs-previous slidesjs-navigation"><</a>
+                    <a href="#" class="slidesjs-next slidesjs-navigation">></a>-->
+
+                </div>
+            </div>
+            <marquee behavior="slide" scrollamount="10" class="well-slide" id="marquee">
+                <!--<a href="#"><img src="img/test01.png" style="height:80px; "></a>-->
+            </marquee>
+        </div>
+        <!--/캐러젤-상세보기-->
+        <h2 style="margin:15px 0;"><span>|</span> 모델리스트</h2>
+        <!--모델리스트-->
+        <div class="list-group" id="modelList">
+
+
+            <!--<div class="list-item">
+                <p class="m-title"><a href="#">TMU1</a></p>
+                <div class="m-body">내용내용ㅇ내요앤요내용<br>내<br>용내<br>용<br>ㅇ내<br><br>요앤<br><br><br><br><br>요내용<br>내<br>용내용ㅇ내<br>요앤요내용내용내용<br>ㅇ내요앤요내용내용내용ㅇ내요앤요내용<br></div>
+            </div>-->
+
+
+        </div>
+        <div class="btn-group" id="listsee1">
+            <!--<button type="button" class="btn btn-del">삭제</button>
+            <button type="button" class="btn btn-edit">수정</button>-->
+            <!--<button type="button" class="btn btn-list" onclick="go_back()">목록</button>-->
+        </div>
+
+    </div>
+</div>
+
+<!--<script src="scripts/jquery.slides.min.js"></script>-->
+
+
